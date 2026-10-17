@@ -23,7 +23,7 @@ npx expo lint             # lint
 npm run export:web        # static web build in dist/ (one page per park, base path /kahu-app)
 ```
 
-Pushing to `main` builds and deploys the web app to GitHub Pages (`.github/workflows/pages.yml`).
+Live: **https://beachfranz.github.io/kahu-app/**. Pushing to `main` builds and deploys it (`.github/workflows/pages.yml`); the park pages are prerendered from the live catalog API at build time, so a redeploy picks up new parks.
 
 ## Layout
 
