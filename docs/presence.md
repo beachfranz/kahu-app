@@ -14,7 +14,9 @@ promises about the same thing.
 ## Decisions (Franz, 2026-10-17)
 
 1. **Followers only.** Details (which dogs, exact times) go to households that follow the park.
-   Everyone else sees fuzzy counts only: "3 dogs here", "2 planned this evening".
+   Everyone else sees fuzzy counts only: "3 dogs here", "2 planned this evening", "24 dogs follow".
+   The find list shows each park's follower count (a stack of dog faces), a live "N here now" dot,
+   counts on the map pins, and a "Most dogs" sort (Franz, 2026-10-17).
 2. **Actual presence two ways.** Verified: the phone is inside the park's outline (needs location
    permission). Manual: "we're here" without location, shown with a softer, dashed mark. Both end
    automatically.
@@ -131,6 +133,8 @@ Server-side functions (security definer, so RLS stays strict on the tables):
 - `check_in(park_id, dog_ids, lat, lon)`: sets `verified` when the point is inside the park
   outline (catalog geometry), else a manual check-in.
 - `park_busy_hours(park_id)`: hour-of-week counts from past actual presence (counts only).
+- `parks_social_counts(park_ids)`: public counts for the find list and map: followers, here now,
+  planned today (no identities).
 
 Plans and groups (invite links, chat inside a plan, RSVP from the web) build on `presence`
 and come next.
