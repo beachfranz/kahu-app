@@ -60,8 +60,26 @@ Database: kahu-dog-park migration `20261018k_presence.sql`, tests in `tests/test
 | We'll be here | plan sheet: today / tomorrow, half-hour start, 30 min to 2 h (server allows up to 4 h, 14 days ahead) | `plan_visit`, `cancel_plan` |
 | Free times + matches | My dogs tab, `/free-time/edit`: days, from / until, parks you follow, tags | `save_availability`, `delete_availability`, `availability_matches`, `my_presence` |
 
-Not built yet: play feedback (private "would play again"), busy-hours from history, notifications, blocking / reporting.
+| Today by hour (bar graph) | park page, in Dogs at this park; public counts: past hours = check-ins, now highlighted, later = plans (dashed) | `park_presence` → `today` (migration `20261018n`) |
+| Dogs following this park | park page, card under Dogs at this park; followers only (dogs, never people); here-now / coming-today dots; filters All / Free when you are / Small dogs; others see the household count | `park_followers` (migration `20261018m`) |
+| Busy times | find cards: dogs checked in by hour over the last 8 weeks; shown after check-ins on 3+ days, else "not enough check-ins yet" (finished check-ins stay in `social.presence`, so no extra history table) | `parks_busy_hours` (migration `20261018l`) |
+
+Find is map-first (2026-10-17): top half map, bottom half cards for the parks in view, numbered like their pins.
+Cards show hours, big / small dog areas, followers, dogs heading there today (planned + here now) and busy time.
+
+Not built yet: events (below), play feedback (private "would play again"), notifications, blocking / reporting.
 Counts treat "today" as Pacific time (launch area); revisit for other time zones.
+
+## Next: events (requested by Franz, 2026-10-17; not designed yet)
+
+Park events such as "puppy socialization" or "high energy chasers meet". To settle before building:
+- who can create one (anyone, people with check-in history, or organisers only);
+- one-off or recurring;
+- how it relates to plans (an event as a shared plan that others join?);
+- visibility (followers only, like presence, or listed publicly on find);
+- rules for who it's for (e.g. puppies under 6 months, energy level, size) and a cap on numbers;
+- moderation and reporting;
+- how events show on the map, the park page and the today-by-hour graph.
 
 ## Original sketch (superseded by the migration)
 
