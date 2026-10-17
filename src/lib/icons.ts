@@ -29,6 +29,8 @@ export const ICON = {
   directions: 'M3 11l18-8-8 18-2-8-8-2z',
   check: 'M5 12l5 5 9-10',
   book: 'M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2zM8 7h6',
+  heart: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
+  arrow: 'M5 12h14M13 6l6 6-6 6',
 };
 export type IconName = keyof typeof ICON;
 

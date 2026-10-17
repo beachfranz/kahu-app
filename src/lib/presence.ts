@@ -94,3 +94,16 @@ export function dayWord(d: Date | string): string {
   const diff = Math.round((new Date(x).setHours(0, 0, 0, 0) - today.getTime()) / 86400000);
   return diff === 0 ? 'Today' : diff === 1 ? 'Tomorrow' : x.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' });
 }
+
+// Busy times: dogs checked in by hour, 6 am-10 pm (17 values), over the last 8 weeks, and on how many days.
+export type Busy = { hours: number[]; days: number };
+export const parksBusyHours = (ids: number[]) =>
+  ids.length ? call<Record<string, Busy>>('parks_busy_hours', { p_park_ids: ids }) : Promise.resolve({});
+export const BUSY_MIN_DAYS = 3;          // fewer days of check-ins than this: "not enough check-ins yet"
+export function busyLabel(b?: Busy): string | null {
+  if (!b || b.days < BUSY_MIN_DAYS || !b.hours.some((v) => v > 0)) return null;
+  const at = b.hours.indexOf(Math.max(...b.hours));
+  const h = (x: number) => `${x % 12 || 12}`;
+  const a = 6 + at;
+  return `${h(a)}–${h(a + 1)} ${a + 1 < 12 ? 'am' : 'pm'}`;
+}

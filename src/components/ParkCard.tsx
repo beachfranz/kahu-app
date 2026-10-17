@@ -1,55 +1,63 @@
+// A park on find, under the map: its number (matches the pin), name, hours, big / small dog areas, how many
+// dogs follow it, how many are heading there today, and when it's busy.
 import { Link } from 'expo-router';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
-import { AmenityChip } from './Chip';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from './Icon';
 import type { ParkSummary } from '@/lib/api';
-import type { Counts } from '@/lib/presence';
 import { openState } from '@/lib/hours';
-import { HIGHLIGHT_CHIPS } from '@/lib/icons';
+import { busyLabel, type Busy, type Counts } from '@/lib/presence';
 import { C, F } from '@/lib/theme';
 
-export function ParkCard({ park, counts }: { park: ParkSummary; counts?: Counts }) {
+export function ParkCard({ park, n, km, counts, busy }:
+  { park: ParkSummary; n: number; km: number; counts?: Counts; busy?: Busy }) {
   const open = openState(park.hours, park.lat, park.lon);
-  const chips = HIGHLIGHT_CHIPS.filter((c) => park.highlights[c.field] === true);
+  const big = park.highlights.large_dog_area === true;
+  const small = park.highlights.small_dog_area === true;
+  const followers = counts?.followers ?? 0;
+  const today = (counts?.planned_today ?? 0) + (counts?.here_now ?? 0);
+  const peak = busyLabel(busy);
+  const max = busy ? Math.max(1, ...busy.hours) : 1;
+  const dist = km < 10 ? km.toFixed(1) : String(Math.round(km));
   return (
     <Link href={{ pathname: '/park/[id]', params: { id: String(park.id) } }} asChild>
-      <Pressable style={s.card} accessibilityRole="link" accessibilityLabel={`${park.name}, ${park.distance_km} km`}>
-        {park.photo ? (
-          <Image source={{ uri: park.photo.thumb_url }} style={s.thumb} accessibilityIgnoresInvertColors />
-        ) : (
-          <View style={[s.thumb, s.noPhoto]}><Text style={s.noPhotoText}>No photo yet</Text></View>
-        )}
+      <Pressable style={s.card} accessibilityRole="link" accessibilityLabel={`${n}. ${park.name}, ${dist} km, ${open.label}`}>
+        <View style={s.num}><Text style={s.numText}>{n}</Text></View>
         <View style={s.body}>
           <View style={s.titleRow}>
             <Text style={s.name} numberOfLines={1}>{park.name}</Text>
-            <Text style={s.dist}>{park.distance_km < 10 ? park.distance_km.toFixed(1) : Math.round(park.distance_km)} km</Text>
+            <Text style={s.dist}>{dist} km</Text>
           </View>
-          <Text style={s.meta} numberOfLines={1}>
-            {park.city ?? ''}{park.city ? ' · ' : ''}
-            <Text style={{ color: open.open ? C.accentDark : C.muted, fontFamily: F.bold }}>{open.label}</Text>
-          </Text>
-          {counts && (counts.followers || counts.here_now || counts.planned_today) ? (
-            <View style={s.social} accessibilityLabel={`${counts.followers} dogs follow, ${counts.here_now} here now, ${counts.planned_today} later today`}>
-              {counts.followers ? (
-                <View style={s.stat}><Icon name="offleash" size={14} color={C.accentDark} width={2} />
-                  <Text style={s.statText}>{counts.followers} follow</Text></View>
-              ) : null}
-              {counts.here_now ? (
-                <View style={s.stat}><View style={s.live} /><Text style={[s.statText, { color: C.live }]}>{counts.here_now} here now</Text></View>
-              ) : null}
-              {counts.planned_today ? (
-                <View style={s.stat}><Icon name="clock" size={13} color={C.muted} width={2} />
-                  <Text style={[s.statText, { color: C.muted }]}>{counts.planned_today} later</Text></View>
-              ) : null}
+          <Text style={[s.hours, { color: open.open ? C.accentDark : C.muted }]} numberOfLines={1}>{open.label}</Text>
+          <View style={s.stats}>
+            <View style={s.stat} accessibilityLabel={big ? 'Big dogs welcome' : 'Big-dog area not listed'}>
+              <Icon name="big" size={18} color={big ? C.text : C.dashed} width={1.9} />
+              <Text style={[s.statText, !big && s.off]}>Big</Text>
             </View>
-          ) : null}
-          {chips.length > 0 && (
-            <View style={s.chips}>
-              {chips.map((c) => (
-                <AmenityChip key={c.field} icon={c.icon} label={c.label} inferred={park.inferred.includes(c.field)} />
-              ))}
+            <View style={s.stat} accessibilityLabel={small ? 'Small-dog area' : 'Small-dog area not listed'}>
+              <Icon name="small" size={18} color={small ? C.text : C.dashed} width={1.9} />
+              <Text style={[s.statText, !small && s.off]}>Small</Text>
             </View>
-          )}
+            <View style={s.stat} accessibilityLabel={`${followers} follow`}>
+              <Icon name="heart" size={15} color={C.accentDark} width={2.1} />
+              <Text style={[s.statText, { color: C.accentDark }]}>{followers}</Text>
+            </View>
+            <View style={s.stat} accessibilityLabel={`${today} heading there today`}>
+              <Icon name="arrow" size={15} color={today ? C.warnIcon : C.faint} width={2.2} />
+              <Text style={[s.statText, { color: today ? C.warnIcon : C.faint }]}>{today} today</Text>
+            </View>
+          </View>
+          <View style={s.busyRow}>
+            {peak && busy ? (
+              <View style={s.bars} accessibilityLabel={`Busiest ${peak}`}>
+                {busy.hours.map((v, i) => (
+                  <View key={i} style={[s.bar, { height: Math.max(2, (v / max) * 16), backgroundColor: v === max ? C.accent : '#B7D9BC' }]} />
+                ))}
+              </View>
+            ) : null}
+            <Text style={s.busyText}>
+              {peak ? <>Busy <Text style={{ fontFamily: F.heavy, color: C.text }}>{peak}</Text></> : 'Busy times: not enough check-ins yet'}
+            </Text>
+          </View>
         </View>
       </Pressable>
     </Link>
@@ -57,18 +65,20 @@ export function ParkCard({ park, counts }: { park: ParkSummary; counts?: Counts 
 }
 
 const s = StyleSheet.create({
-  card: { flexDirection: 'row', gap: 12, padding: 12, borderRadius: 18, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg },
-  thumb: { width: 76, height: 76, borderRadius: 14, backgroundColor: C.photo },
-  noPhoto: { backgroundColor: C.surface, justifyContent: 'flex-end', padding: 6 },
-  noPhotoText: { fontFamily: F.bold, fontSize: 10, color: C.muted },
-  body: { flex: 1, minWidth: 0, gap: 4 },
+  card: { flexDirection: 'row', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg },
+  num: { width: 26, height: 26, borderRadius: 13, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center' },
+  numText: { fontFamily: F.heavy, fontSize: 13, color: '#FFFFFF' },
+  body: { flex: 1, minWidth: 0, gap: 5 },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  name: { flex: 1, fontFamily: F.heavy, fontSize: 17, color: C.text },
-  dist: { fontFamily: F.bold, fontSize: 13, color: C.muted },
-  meta: { fontFamily: F.regular, fontSize: 13, color: C.muted },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 },
-  social: { flexDirection: 'row', flexWrap: 'wrap', gap: 12, alignItems: 'center' },
+  name: { flex: 1, fontFamily: F.heavy, fontSize: 16, color: C.text },
+  dist: { fontFamily: F.bold, fontSize: 12, color: C.muted },
+  hours: { fontFamily: F.bold, fontSize: 13 },
+  stats: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
   stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  statText: { fontFamily: F.heavy, fontSize: 13, color: C.accentDark },
-  live: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.live },
+  statText: { fontFamily: F.heavy, fontSize: 13, color: C.text },
+  off: { color: C.faint },
+  busyRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
+  bars: { flexDirection: 'row', alignItems: 'flex-end', gap: 2, height: 16 },
+  bar: { width: 5, borderTopLeftRadius: 2, borderTopRightRadius: 2 },
+  busyText: { fontFamily: F.regular, fontSize: 12, color: C.muted },
 });
