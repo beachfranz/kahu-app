@@ -27,8 +27,11 @@ Live: **https://beachfranz.github.io/kahu-app/**. Pushing to `main` builds and d
 
 ## Layout
 
-- `src/app/index.tsx` — find: location (or Irvine by default), search, filters, park cards
+- `src/app/(tabs)/index.tsx` — find: location (or Irvine by default), search, filters, park cards
 - `src/app/park/[id].tsx` — park page: photos with credits, open status, directions, amenity tiles
   (tap → source sheet), rules & hours, questions for locals
-- `src/lib/api.ts` — catalog API client (publishable key; read-only)
+- `src/app/(tabs)/dogs.tsx` — My dogs: email-code sign-in, profile (first name, neighborhood), dog cards
+- `src/app/dog/edit.tsx` — add / edit a dog (photo, breed, birthday, size, energy, play styles, compatibility)
+- `src/lib/api.ts` — catalog API client (publishable key; read-only); session kept in localStorage / AsyncStorage
+- `src/lib/social.ts` — sign-in (6-digit email code) and the signed-in profile functions (kahu-dog-park migration 20261018j)
 - `src/lib/icons.ts`, `src/components/*` — line icons, chips, tiles, source sheet; `src/lib/theme.ts` — Park morning

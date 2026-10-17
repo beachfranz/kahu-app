@@ -36,7 +36,11 @@
           "locationWhenInUsePermission": "Kahu uses your location to show dog parks near you."
         }
       ],
-      "expo-font"
+      "expo-font",
+      [
+        "expo-image-picker",
+        { "photosPermission": "Kahu uses your photos so you can add a picture of your dog." }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,

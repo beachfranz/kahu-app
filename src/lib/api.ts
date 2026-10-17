@@ -1,12 +1,21 @@
 // Kahu catalog API (kahu-dog-park/docs/API.md): two public RPCs on the Kahu Supabase project.
 // The publishable key is safe to ship: the functions decide what is public; tables stay closed.
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { createClient } from '@supabase/supabase-js';
+import { Platform } from 'react-native';
 
 export const SUPABASE_URL = 'https://zncqyjhgquzqxwitcbvc.supabase.co';
 export const SUPABASE_KEY = 'sb_publishable_Eu-hM-GFvii-3SQaA8IOrQ_X66wBRWz';
 
+// Sessions persist: localStorage on the web (absent while the static export renders), AsyncStorage on phones.
+const isServer = Platform.OS === 'web' && typeof window === 'undefined';
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
-  auth: { persistSession: false, autoRefreshToken: false },
+  auth: {
+    persistSession: !isServer,
+    autoRefreshToken: !isServer,
+    detectSessionInUrl: false,
+    storage: Platform.OS === 'web' ? undefined : AsyncStorage,
+  },
 });
 
 export type Highlights = Partial<Record<
