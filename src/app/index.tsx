@@ -4,6 +4,7 @@ import { ActivityIndicator, FlatList, ScrollView, StyleSheet, Text, TextInput, V
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FilterChip } from '@/components/Chip';
 import { Icon } from '@/components/Icon';
+import { MapStrip } from '@/components/MapStrip';
 import { ParkCard } from '@/components/ParkCard';
 import { parksNear, type ParkSummary } from '@/lib/api';
 import { FILTERS } from '@/lib/icons';
@@ -70,6 +71,7 @@ export default function Find() {
                             onPress={() => setOn((o) => ({ ...o, [f.field]: !o[f.field] }))} />
               ))}
             </ScrollView>
+            <MapStrip parks={parks ?? []} place={place} />
             <Text style={s.count}>
               {parks === null ? ' ' : `${parks.length} park${parks.length === 1 ? '' : 's'}${active.length ? ` with ${active.join(', ')}` : ''} · nearest first`}
             </Text>
