@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Kahu",
+    "slug": "kahu",
+    "version": "0.1.0",
+    "scheme": "kahu",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.franzfunk.kahu",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Kahu uses your location to show dog parks near you."
+      }
+    },
+    "android": {
+      "package": "com.franzfunk.kahu",
+      "adaptiveIcon": {
+        "backgroundColor": "#E3F1E8",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png",
+      "output": "static"
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Kahu uses your location to show dog parks near you."
+        }
+      ],
+      "expo-font"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "baseUrl": "/kahu-app"
+    }
+  }
+}
