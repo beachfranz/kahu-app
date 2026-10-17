@@ -7,6 +7,7 @@ import { Icon } from '@/components/Icon';
 import { MapStrip } from '@/components/MapStrip';
 import { ParkCard } from '@/components/ParkCard';
 import { parksNear, type ParkSummary } from '@/lib/api';
+import { socialCounts, type Counts } from '@/lib/presence';
 import { FILTERS } from '@/lib/icons';
 import { usePlace } from '@/lib/location';
 import { C, F } from '@/lib/theme';
@@ -19,6 +20,7 @@ export default function Find() {
   const [on, setOn] = useState<Record<string, boolean>>({});
   const [parks, setParks] = useState<ParkSummary[] | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [counts, setCounts] = useState<Record<string, Counts>>({});
 
   const filters = useMemo(() => {
     const f: Record<string, boolean | string> = {};
@@ -36,6 +38,16 @@ export default function Find() {
     }, q ? 250 : 0);
     return () => { alive = false; clearTimeout(t); };
   }, [place.lat, place.lon, filters, q]);
+
+  // Followers / here now / later today per park (public counts; refreshed with the list and every minute).
+  const ids = useMemo(() => (parks ?? []).map((p) => p.id), [parks]);
+  useEffect(() => {
+    let alive = true;
+    const get = () => socialCounts(ids).then((c) => { if (alive) setCounts(c); }).catch(() => undefined);
+    get();
+    const t = setInterval(get, 60000);
+    return () => { alive = false; clearInterval(t); };
+  }, [ids]);
 
   const active = FILTERS.filter((f) => on[f.field]).map((f) => f.label.toLowerCase());
 
@@ -77,7 +89,7 @@ export default function Find() {
             </Text>
           </View>
         }
-        renderItem={({ item }) => <ParkCard park={item} />}
+        renderItem={({ item }) => <ParkCard park={item} counts={counts[String(item.id)]} />}
         ListEmptyComponent={
           error ? <Text style={s.empty}>Couldn’t load parks: {error}</Text>
           : parks === null ? <ActivityIndicator color={C.accent} style={{ marginTop: 40 }} />

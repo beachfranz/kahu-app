@@ -7,6 +7,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AmenityTile, type TileState } from '@/components/AmenityTile';
 import { Icon } from '@/components/Icon';
+import { PresenceCard } from '@/components/PresenceCard';
 import { SourceSheet } from '@/components/SourceSheet';
 import { answerQuestion, park as fetchPark, parksNear, type Attribute, type Park } from '@/lib/api';
 import { openState } from '@/lib/hours';
@@ -151,6 +152,8 @@ export default function ParkScreen() {
             <Icon name="directions" size={20} color="#FFFFFF" width={2} />
             <Text style={s.primaryText}>Directions</Text>
           </Pressable>
+
+          <PresenceCard parkId={p.id} parkName={p.name} />
 
           <View style={{ gap: 10 }}>
             <Text style={s.h2} accessibilityRole="header">Good to know</Text>

@@ -47,7 +47,23 @@ promises about the same thing.
   get manual presence only until traced.
 - **Store requirements** (both stores): report, block, content filtering, terms of service, in v1.
 
-## Data model (sketch — not applied)
+## Built (2026-10-17)
+
+Database: kahu-dog-park migration `20261018k_presence.sql`, tests in `tests/test_presence.py`.
+
+| Piece | Where it shows | Function |
+|---|---|---|
+| Counts (follow / here now / later today) | find cards, park page; public | `parks_social_counts`, `park_presence` |
+| Follow | park page | `follow_park` (plans, check-ins and free times follow automatically) |
+| Here now / Coming (dogs, times) | park page, followers only | `park_presence` |
+| We're here | park page; verified inside the outline (25 m, 75 m for point parks), else dashed "by hand"; the position is not stored; default 90 min; ends other check-ins and fulfils a plan | `check_in`, `leave_park` |
+| We'll be here | plan sheet: today / tomorrow, half-hour start, 30 min to 2 h (server allows up to 4 h, 14 days ahead) | `plan_visit`, `cancel_plan` |
+| Free times + matches | My dogs tab, `/free-time/edit`: days, from / until, parks you follow, tags | `save_availability`, `delete_availability`, `availability_matches`, `my_presence` |
+
+Not built yet: play feedback (private "would play again"), busy-hours from history, notifications, blocking / reporting.
+Counts treat "today" as Pacific time (launch area); revisit for other time zones.
+
+## Original sketch (superseded by the migration)
 
 Schema `social` on the Kahu Supabase project; every table behind RLS keyed to `auth.uid()`.
 `park_id` references the catalog's `public.dog_parks(id)`.

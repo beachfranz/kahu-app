@@ -3,7 +3,11 @@ import Head from 'expo-router/head';
 import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { FaceStack } from '@/components/DogFace';
 import { Button, Field } from '@/components/Form';
+import {
+  availabilityMatches, clock, dayWord, hhmm, myPresence, TAGS, WEEKDAY_NAME, type Match, type MyPresence,
+} from '@/lib/presence';
 import {
   age, ENERGY, FLAGS, myProfile, photoUrl, PLAY_STYLES, saveProfile, sendCode, signOut, SIZES, useSession, verifyCode,
   type Dog, type Profile,
@@ -53,6 +57,7 @@ export default function MyDogs() {
               {profile.dogs.length < 8 ? (
                 <Button label="+ Add a dog" kind="secondary" onPress={() => router.push('/dog/edit')} />
               ) : null}
+              {profile.dogs.length ? <Together dogs={profile.dogs} /> : null}
               <Pressable onPress={() => signOut()} accessibilityRole="button" style={{ alignSelf: 'center', padding: 12 }}>
                 <Text style={s.linkText}>Sign out</Text>
               </Pressable>
@@ -171,6 +176,80 @@ function DogCard({ dog }: { dog: Dog }) {
   );
 }
 
+const tagLabel = (k: string) => TAGS.find(([v]) => v === k)?.[1] ?? k;
+const days = (w: number[]) => (w.length === 7 ? 'Every day' : [1, 2, 3, 4, 5, 6, 0].filter((d) => w.includes(d)).map((d) => WEEKDAY_NAME[d]).join(', '));
+
+// Plans, free times and matches: the parts of presence that live with you rather than with one park.
+function Together({ dogs }: { dogs: Dog[] }) {
+  const [mine, setMine] = useState<MyPresence | undefined>(undefined);
+  const [matches, setMatches] = useState<Match[]>([]);
+  useFocusEffect(useCallback(() => {
+    myPresence().then(setMine).catch(() => setMine(null));
+    availabilityMatches().then(setMatches).catch(() => setMatches([]));
+  }, []));
+  if (mine === undefined) return null;
+  const name = (ids: string[]) => dogs.filter((d) => ids.includes(d.id)).map((d) => d.name).join(' & ');
+  const upcoming = mine?.upcoming ?? [];
+  const free = mine?.availability ?? [];
+  return (
+    <>
+      {upcoming.length ? (
+        <>
+          <Text style={s.h2} accessibilityRole="header">Your plans</Text>
+          {upcoming.map((u) => (
+            <Pressable key={u.id} style={s.row} accessibilityRole="link"
+                       onPress={() => router.push({ pathname: '/park/[id]', params: { id: String(u.park_id) } })}>
+              <View style={[s.liveDot, { backgroundColor: u.kind === 'actual' ? C.live : C.dashed }]} />
+              <View style={{ flex: 1 }}>
+                <Text style={s.rowTitle} numberOfLines={1}>{u.park}</Text>
+                <Text style={s.small}>{u.kind === 'actual' ? `Here now until ${clock(u.ends_at)}`
+                  : `${dayWord(u.starts_at)} ${clock(u.starts_at)}–${clock(u.ends_at)}`} · {name(u.dog_ids)}</Text>
+              </View>
+            </Pressable>
+          ))}
+        </>
+      ) : null}
+
+      <Text style={s.h2} accessibilityRole="header">Free times</Text>
+      {free.length ? free.map((a) => (
+        <Pressable key={a.id} style={s.row} accessibilityRole="button" accessibilityLabel={`Edit free time ${days(a.weekdays)}`}
+                   onPress={() => router.push({ pathname: '/free-time/edit', params: { id: a.id } })}>
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text style={s.rowTitle}>{days(a.weekdays)} · {hhmm(a.start_local)}–{hhmm(a.end_local)}</Text>
+            <Text style={s.small} numberOfLines={2}>
+              {(mine?.follows ?? []).filter((f) => a.park_ids.includes(f.park_id)).map((f) => f.park).join(', ')}
+              {a.tags.length ? ` · ${a.tags.map(tagLabel).join(', ')}` : ''}
+            </Text>
+          </View>
+        </Pressable>
+      )) : (
+        <View style={s.empty}>
+          <Text style={s.muted}>Add when you can usually go. You’ll see other dogs who are free at the same parks and times, even before anyone checks in.</Text>
+        </View>
+      )}
+      <Button label="+ Add a free time" kind="secondary" onPress={() => router.push('/free-time/edit')} />
+
+      {free.length ? (
+        <>
+          <Text style={s.h2} accessibilityRole="header">Dogs free when you are</Text>
+          {matches.length ? matches.map((m, i) => (
+            <Pressable key={i} style={s.row} accessibilityRole="link"
+                       onPress={() => router.push({ pathname: '/park/[id]', params: { id: String(m.park_id) } })}>
+              <FaceStack dogs={m.dogs ?? []} size={40} max={3} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text style={s.rowTitle} numberOfLines={1}>{(m.dogs ?? []).map((d) => d.name).join(' & ')}</Text>
+                <Text style={s.small} numberOfLines={2}>
+                  {WEEKDAY_NAME[m.weekday]} {hhmm(m.from)}–{hhmm(m.until)} · {m.park}{m.tags.length ? ` · ${m.tags.map(tagLabel).join(', ')}` : ''}
+                </Text>
+              </View>
+            </Pressable>
+          )) : <Text style={s.muted}>No matches yet. They show up here as other dogs add free times at your parks.</Text>}
+        </>
+      ) : null}
+    </>
+  );
+}
+
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: C.bg },
   body: { padding: 20, gap: 16, maxWidth: 640, width: '100%', alignSelf: 'center' },
@@ -193,4 +272,7 @@ const s = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { paddingHorizontal: 9, height: 24, borderRadius: 12, backgroundColor: C.yesBg, justifyContent: 'center' },
   chipText: { fontFamily: F.heavy, fontSize: 12, color: C.accentDark },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: C.line, minHeight: 56 },
+  rowTitle: { fontFamily: F.heavy, fontSize: 15, color: C.text },
+  liveDot: { width: 10, height: 10, borderRadius: 5 },
 });
