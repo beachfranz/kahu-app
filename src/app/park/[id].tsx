@@ -7,10 +7,12 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { AmenityTile, type TileState } from '@/components/AmenityTile';
 import { Icon } from '@/components/Icon';
+import { FollowersCard } from '@/components/FollowersCard';
 import { PresenceCard } from '@/components/PresenceCard';
 import { SourceSheet } from '@/components/SourceSheet';
 import { answerQuestion, park as fetchPark, parksNear, type Attribute, type Park } from '@/lib/api';
 import { openState } from '@/lib/hours';
+import type { ParkPresence } from '@/lib/presence';
 import { AMENITY_TILES, SURFACE_LABEL } from '@/lib/icons';
 import { C, F } from '@/lib/theme';
 
@@ -50,6 +52,7 @@ export default function ParkScreen() {
   const [error, setError] = useState<string | null>(null);
   const [sheet, setSheet] = useState<{ title: string; attr: Attribute } | null>(null);
   const [asked, setAsked] = useState<Record<string, 'sent' | 'error'>>({});
+  const [presence, setPresence] = useState<ParkPresence | null>(null);
   const width = Math.min(Dimensions.get('window').width, 720);
 
   useEffect(() => {
@@ -153,7 +156,8 @@ export default function ParkScreen() {
             <Text style={s.primaryText}>Directions</Text>
           </Pressable>
 
-          <PresenceCard parkId={p.id} parkName={p.name} />
+          <PresenceCard parkId={p.id} parkName={p.name} onPresence={setPresence} />
+          <FollowersCard parkId={p.id} presence={presence} />
 
           <View style={{ gap: 10 }}>
             <Text style={s.h2} accessibilityRole="header">Good to know</Text>

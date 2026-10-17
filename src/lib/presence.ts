@@ -107,3 +107,7 @@ export function busyLabel(b?: Busy): string | null {
   const a = 6 + at;
   return `${h(a)}–${h(a + 1)} ${a + 1 < 12 ? 'am' : 'pm'}`;
 }
+
+// Dogs following a park (followers only; null when the caller doesn't follow).
+export type FollowerDog = DogCard & { status: 'here' | 'coming' | null; free_match: boolean; mine: boolean };
+export const parkFollowers = (id: number) => call<FollowerDog[] | null>('park_followers', { p_park_id: id });

@@ -12,7 +12,8 @@ import {
 import { myProfile, useSession, type Dog } from '@/lib/social';
 import { C, F } from '@/lib/theme';
 
-export function PresenceCard({ parkId, parkName }: { parkId: number; parkName: string }) {
+export function PresenceCard({ parkId, parkName, onPresence }:
+  { parkId: number; parkName: string; onPresence?: (pp: ParkPresence) => void }) {
   const { session, ready } = useSession();
   const [pp, setPp] = useState<ParkPresence | null>(null);
   const [myDogs, setDogs] = useState<Dog[] | null>(null);     // null = not loaded
@@ -25,6 +26,7 @@ export function PresenceCard({ parkId, parkName }: { parkId: number; parkName: s
     parkPresence(parkId).then(setPp).catch((e: Error) => setMsg(e.message));
   }, [parkId]);
   useEffect(() => { if (ready) load(); }, [ready, session, load]);
+  useEffect(() => { if (pp) onPresence?.(pp); }, [pp, onPresence]);
   useEffect(() => {
     if (!session) return;
     myProfile().then((p) => { const d = p?.dogs ?? []; setDogs(d); setWho(d.map((x) => x.id)); }).catch(() => setDogs([]));
