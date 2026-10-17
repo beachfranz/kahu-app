@@ -9,8 +9,10 @@ export type DogCard = {
   play_styles: string[]; ok_small_dogs: boolean | null; ok_puppies: boolean | null; slow_intros: boolean | null;
 };
 export type Mine = { id: string; kind: 'planned' | 'actual'; verified: boolean; starts_at: string; ends_at: string; dog_ids: string[] };
+export type HourCount = { hour: number; checked_in: number; planned: number };
 export type ParkPresence = Counts & {
   following: boolean;
+  today?: HourCount[];                       // 6 am-10 pm today, counts only (public)
   mine?: Mine[];
   here?: (DogCard & { verified: boolean; until: string; mine: boolean })[];
   later?: { starts_at: string; ends_at: string; mine: boolean; dogs: DogCard[] }[];

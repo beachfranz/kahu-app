@@ -6,6 +6,7 @@ import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-nati
 import { DogFace, FaceStack } from './DogFace';
 import { Icon } from './Icon';
 import { PlanSheet } from './PlanSheet';
+import { TodayBars } from './TodayBars';
 import {
   cancelPlan, checkIn, clock, dayWord, followPark, leavePark, parkPresence, planVisit, type ParkPresence,
 } from '@/lib/presence';
@@ -68,6 +69,8 @@ export function PresenceCard({ parkId, parkName, onPresence }:
         <Count n={pp.planned_today} label="later today" />
         <Count n={pp.followers} label={pp.followers === 1 ? 'follows' : 'follow'} />
       </View>
+
+      {pp.today ? <TodayBars hours={pp.today} /> : null}
 
       {pp.following ? (
         <>
