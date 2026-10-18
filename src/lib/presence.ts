@@ -3,7 +3,7 @@
 import * as Location from 'expo-location';
 import { supabase } from './api';
 
-export type Counts = { followers: number; here_now: number; planned_today: number };
+export type Counts = { followers: number; follower_dogs?: number; here_now: number; planned_today: number };
 export type DogCard = {
   id: string; name: string; photo_path: string | null; size_band: string | null; energy: string | null;
   play_styles: string[]; ok_small_dogs: boolean | null; ok_puppies: boolean | null; slow_intros: boolean | null;

@@ -1,5 +1,5 @@
 // A park on find, under the map: its number (matches the pin), name, hours, big / small dog areas, how many
-// dogs follow it, how many are heading there today, and when it's busy.
+// dogs follow it (always shown, zero too), how many are heading there today, and when it's busy.
 import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { Icon } from './Icon';
@@ -13,7 +13,7 @@ export function ParkCard({ park, n, km, counts, busy }:
   const open = openState(park.hours, park.lat, park.lon);
   const big = park.highlights.large_dog_area === true;
   const small = park.highlights.small_dog_area === true;
-  const followers = counts?.followers ?? 0;
+  const dogs = counts?.follower_dogs ?? 0;
   const today = (counts?.planned_today ?? 0) + (counts?.here_now ?? 0);
   const peak = busyLabel(busy);
   const max = busy ? Math.max(1, ...busy.hours) : 1;
@@ -27,6 +27,12 @@ export function ParkCard({ park, n, km, counts, busy }:
             <Text style={s.name} numberOfLines={1}>{park.name}</Text>
             <Text style={s.dist}>{dist} km</Text>
           </View>
+          <View style={[s.follow, dogs ? s.followOn : s.followZero]}
+                accessibilityLabel={`${dogs} ${dogs === 1 ? 'dog follows' : 'dogs follow'} this park`}>
+            <Icon name="offleash" size={16} color={dogs ? '#FFFFFF' : C.faint} width={2.1} />
+            <Text style={[s.followN, { color: dogs ? '#FFFFFF' : C.muted }]}>{dogs}</Text>
+            <Text style={[s.followL, { color: dogs ? '#FFFFFF' : C.muted }]}>{dogs === 1 ? 'dog follows' : 'dogs follow'}</Text>
+          </View>
           <Text style={[s.hours, { color: open.open ? C.accentDark : C.muted }]} numberOfLines={1}>{open.label}</Text>
           <View style={s.stats}>
             <View style={s.stat} accessibilityLabel={big ? 'Big dogs welcome' : 'Big-dog area not listed'}>
@@ -36,10 +42,6 @@ export function ParkCard({ park, n, km, counts, busy }:
             <View style={s.stat} accessibilityLabel={small ? 'Small-dog area' : 'Small-dog area not listed'}>
               <Icon name="small" size={18} color={small ? C.text : C.dashed} width={1.9} />
               <Text style={[s.statText, !small && s.off]}>Small</Text>
-            </View>
-            <View style={s.stat} accessibilityLabel={`${followers} follow`}>
-              <Icon name="heart" size={15} color={C.accentDark} width={2.1} />
-              <Text style={[s.statText, { color: C.accentDark }]}>{followers}</Text>
             </View>
             <View style={s.stat} accessibilityLabel={`${today} heading there today`}>
               <Icon name="arrow" size={15} color={today ? C.warnIcon : C.faint} width={2.2} />
@@ -73,6 +75,11 @@ const s = StyleSheet.create({
   name: { flex: 1, fontFamily: F.heavy, fontSize: 16, color: C.text },
   dist: { fontFamily: F.bold, fontSize: 12, color: C.muted },
   hours: { fontFamily: F.bold, fontSize: 13 },
+  follow: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 5, height: 28, paddingHorizontal: 10, borderRadius: 14 },
+  followOn: { backgroundColor: C.accent },
+  followZero: { backgroundColor: C.bg, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.dashed },
+  followN: { fontFamily: F.heavy, fontSize: 15 },
+  followL: { fontFamily: F.bold, fontSize: 13 },
   stats: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
   stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   statText: { fontFamily: F.heavy, fontSize: 13, color: C.text },
