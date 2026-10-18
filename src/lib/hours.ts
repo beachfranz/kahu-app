@@ -55,7 +55,8 @@ export function openState(hours: Hours, lat: number, lon: number, now = new Date
   }
   const o = toMinutes(hours?.open_time, lat, lon, now);
   const c = toMinutes(hours?.close_time, lat, lon, now);
-  if (o == null && c == null) return { label: 'Hours not listed', open: null };
+  // Hours stated but not in a form we turn into times (Checkers' split morning closure): point to the text.
+  if (o == null && c == null) return { label: hours?.hours_text ? 'Hours on park page' : 'Hours not listed', open: null };
   const t = now.getHours() * 60 + now.getMinutes();
   const word = (v?: string, min?: number | null) =>
     v === 'dusk' || v === 'sunset' ? 'dusk' : v === 'dawn' || v === 'sunrise' ? 'dawn' : fmt(min ?? 0);
