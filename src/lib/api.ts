@@ -37,7 +37,8 @@ export type Photo = {
   commercial_ok: boolean;
 };
 
-export type Hours = { open_time?: string; close_time?: string; hours_text?: string } | null;
+// hours_by_day: all 7 days ('mon'...'sun' -> 'HH:MM-HH:MM' | 'dawn-dusk' | 'closed') when hours differ by weekday.
+export type Hours = { open_time?: string; close_time?: string; hours_text?: string; hours_by_day?: Record<string, string> } | null;
 
 export type ParkSummary = {
   id: number;

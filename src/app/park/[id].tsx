@@ -74,6 +74,7 @@ export default function ParkScreen() {
   const open = openState({
     open_time: by.open_time?.value as string | undefined,
     close_time: by.close_time?.value as string | undefined,
+    hours_by_day: by.hours_by_day?.value as Record<string, string> | undefined,
   }, p.location.lat, p.location.lon);
 
   const tiles = AMENITY_TILES.map((t) => {

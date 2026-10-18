@@ -42,7 +42,17 @@ function fmt(min: number): string {
 
 export type OpenState = { label: string; open: boolean | null };
 
+const DAY_KEYS = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+
 export function openState(hours: Hours, lat: number, lon: number, now = new Date()): OpenState {
+  // Hours that differ by weekday (Irvine: Wednesday 4 PM–10 PM): today's (Franz 2026-10-18).
+  const today = hours?.hours_by_day?.[DAY_KEYS[now.getDay()]];
+  if (today) {
+    if (today === 'closed') return { label: 'Closed today', open: false };
+    const [a, b] = today.split('-');
+    const s = openState({ open_time: a, close_time: b }, lat, lon, now);
+    return { ...s, label: s.label.replace(/^Open · /, 'Open today · ').replace(/^Closed · /, 'Closed now · today ') };
+  }
   const o = toMinutes(hours?.open_time, lat, lon, now);
   const c = toMinutes(hours?.close_time, lat, lon, now);
   if (o == null && c == null) return { label: 'Hours not listed', open: null };
