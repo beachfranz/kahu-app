@@ -9,10 +9,11 @@ import { HOME_PARK_ID, HOME_PARK_NAME } from '@/lib/home';
 import type { IconName } from '@/lib/icons';
 import { C, F } from '@/lib/theme';
 
+// Tagline: Franz 2026-10-18. The points say how: see the dogs, find good matches, meet again.
 const POINTS: { icon: IconName; title: string; body: string }[] = [
-  { icon: 'clock', title: 'See who’s at the park', body: 'Which dogs are there now, who’s coming, and when it’s busy.' },
-  { icon: 'pin', title: 'Say when you’re going', body: 'Tap “We’ll be here” so friends can meet you there.' },
-  { icon: 'offleash', title: 'Meet dogs who play like yours', body: 'Add your dog’s size, energy and play style to find good matches.' },
+  { icon: 'clock', title: 'See who’s at the park', body: 'Which dogs are here now, who’s coming later, and when it’s busy.' },
+  { icon: 'offleash', title: 'Meet dogs who play like yours', body: 'Size, energy and play style, so your dog finds a good match.' },
+  { icon: 'pin', title: 'Meet up again', body: 'Tap “We’ll be here” and your dog’s friends know when to come.' },
 ];
 
 export function Welcome({ onAddDog, onLook }: { onAddDog: () => void; onLook: () => void }) {
@@ -35,8 +36,8 @@ export function Welcome({ onAddDog, onLook }: { onAddDog: () => void; onLook: ()
           {photo?.attribution ? <Text style={s.credit} numberOfLines={1}>{photo.attribution}</Text> : null}
         </View>
         <SafeAreaView edges={['bottom']} style={s.body}>
-          <Text style={s.eyebrow}>Welcome to Kahu</Text>
-          <Text style={s.h1} accessibilityRole="header">Meet the dogs of {HOME_PARK_NAME}</Text>
+          <Text style={s.eyebrow}>{HOME_PARK_NAME}</Text>
+          <Text style={s.h1} accessibilityRole="header">Find your dog’s new friends</Text>
           <View style={s.points}>
             {POINTS.map((pt) => (
               <View key={pt.title} style={s.point}>
