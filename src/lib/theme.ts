@@ -33,3 +33,6 @@ export const F = {
   bold: 'Nunito_700Bold' + fallback,
   heavy: 'Nunito_800ExtraBold' + fallback,
 };
+
+// The tab bar's style, shared by the tabs layout and the home tab (which hides it during the welcome).
+export const TAB_BAR = { borderTopColor: C.line, height: 64, paddingTop: 6 };
