@@ -27,8 +27,9 @@ Live: **https://beachfranz.github.io/kahu-app/**. Pushing to `main` builds and d
 
 ## Layout
 
-- `src/app/(tabs)/index.tsx` — find: location (or Irvine by default), search, filters, park cards
-- `src/app/park/[id].tsx` — park page: photos with credits, open status, directions, amenity tiles
+- `src/app/(tabs)/index.tsx` — home: v1 opens on Huntington Beach Dog Park (`src/lib/home.ts`); no find tab for now (Franz, 2026-10-18)
+- `src/app/find.tsx` — find (parked, still at /find): location (or Irvine by default), search, filters, park cards
+- `src/app/park/[id].tsx` → `src/components/ParkView.tsx` — park page: photos with credits, open status, directions, amenity tiles
   (tap → source sheet), rules & hours, questions for locals
 - `src/app/(tabs)/dogs.tsx` — My dogs: email-code sign-in, profile (first name, neighborhood), dog cards
 - `src/app/dog/edit.tsx` — add / edit a dog (photo, breed, birthday, size, energy, play styles, compatibility)
