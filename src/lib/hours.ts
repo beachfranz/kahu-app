@@ -50,8 +50,9 @@ export function openState(hours: Hours, lat: number, lon: number, now = new Date
   const word = (v?: string, min?: number | null) =>
     v === 'dusk' || v === 'sunset' ? 'dusk' : v === 'dawn' || v === 'sunrise' ? 'dawn' : fmt(min ?? 0);
   if (o != null && c != null) {
-    if (t >= o && t < c) return { label: `Open until ${word(hours?.close_time, c)}`, open: true };
-    return { label: `Closed · opens ${word(hours?.open_time, o)}`, open: false };
+    // Open to close, always both ends (Franz 2026-10-18): "Open · 7:30 AM–8:45 PM".
+    const range = `${word(hours?.open_time, o)}–${word(hours?.close_time, c)}`;
+    return t >= o && t < c ? { label: `Open · ${range}`, open: true } : { label: `Closed · ${range}`, open: false };
   }
   if (c != null) return t < c ? { label: `Open until ${word(hours?.close_time, c)}`, open: true }
                               : { label: 'Closed now', open: false };
