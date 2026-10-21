@@ -72,12 +72,12 @@ routine and accountability for free. A one-off group is an event (later).
 2. **Who runs it:** the household that started it (edits it, and later approves requests).
 3. **Open groups only at launch.** Invite-only groups will probably be a premium feature.
 4. **No size limit** to start.
-5. **A shared group chat.** This changes the "no messaging between people" rule (2026-10-17). Proposed shape, not yet confirmed:
+5. **A shared group chat.** This changes the "no messaging between people" rule (2026-10-17). Shape (confirmed 2026-10-21: signature, full history, safety minimum):
    - members only; no direct messages;
    - messages signed by the dog with the owner's first name ("Biscuit (Ana)"), shown inside the group only, which matches the profile's promise that a first name is seen only inside a plan you share;
    - text only to start (no photos or links);
    - quick actions: running late, not coming this week, cancelled this week.
-6. **Safety and fit:** deferred, except a proposed minimum for chat from day one: report a message (to the review queue), mute a member (private), leave the group.
+6. **Safety and fit:** deferred, except this minimum for chat from day one (confirmed): report a message (to the review queue), mute a member (private), leave the group.
 
 **Proposed, not yet decided**
 - **Parts:** park, weekly time(s), name about the dogs and play (no people's names), play tags, which dogs; open to newcomers or nothing.
@@ -89,8 +89,9 @@ routine and accountability for free. A one-off group is an event (later).
 - **Visible:** counts and the description for everyone; which dogs for followers and members.
 
 **Open questions**
-- Chat signature: dog + first name, dog only, or first name only?
-- Chat history: keep it all, or expire messages (e.g. after 30 days)?
+- Chat signature: **decided**, the dog's name + the owner's first name ("Biscuit (Ana)").
+- Chat history: **decided**, keep everything.
+- Chat technology: own (Supabase Realtime) vs a chat service; see the discussion in chat 2026-10-21.
 - Co-runners, or handing a group over when its runner leaves.
 - Safety and fit (#6): removing a dog, private fit notes, bans.
 
