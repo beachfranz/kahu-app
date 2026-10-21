@@ -79,6 +79,11 @@ routine and accountability for free. A one-off group is an event (later).
    - quick actions: running late, not coming this week, cancelled this week.
 6. **Safety and fit:** deferred, except this minimum for chat from day one (confirmed): report a message (to the review queue), mute a member (private), leave the group.
 
+7. **Size and energy are crucial** (Franz 2026-10-21) for the dog profile, groups and compatibility:
+   - **Profile:** size (small / medium / large / giant) and energy (low / medium / high) become required. Today they are optional.
+   - **Groups:** every group states the sizes and the energy it is for ("Small · calm", "Medium-large · high energy"). Play tags are secondary.
+   - **Matching:** matches and "good fits" filter by size and energy first, then free time, then play style. The exact rule is still open.
+
 **Proposed, not yet decided**
 - **Parts:** park, weekly time(s), name about the dogs and play (no people's names), play tags, which dogs; open to newcomers or nothing.
 - **Find:**
@@ -94,6 +99,8 @@ routine and accountability for free. A one-off group is an event (later).
 - Chat technology: **decided (A)**: our own messages table + Supabase Realtime + an open-source chat screen (react-native-gifted-chat or similar); members-only RLS; reports into the review queue. A hosted service (Stream) stays the fallback if chat grows into threads / reactions / auto-moderation. Push notifications stay parked (alerts recorded only).
 - Co-runners, or handing a group over when its runner leaves.
 - Safety and fit (#6): removing a dog, private fit notes, bans.
+- Size and energy matching rule. Proposed: a group's sizes must include the dog's size, and its energy must be the same or one step away. Dog-to-dog matches use the same rule. Puppies and slow-intros dogs prefer low or medium energy.
+- Required size / energy on existing profiles: ask on the next visit to My dogs, or block joining groups until set?
 
 ## How they feed each other
 
