@@ -60,6 +60,40 @@ Every presence or calendar feature has to serve one of these intents. If it does
   3. **Dog friends**, for the medium intents.
   4. **A calendar feed** for Google / Apple.
 
+## Groups (design in progress, Franz 2026-10-21)
+
+A group is a recurring meetup of dogs at one park, at a regular weekly time, for a kind of play: "Small dogs,
+Sundays 9-10 a.m., Bark Barracks, calm play, newcomers welcome". It serves both top intents: a standing answer
+to "where will my dog find the right play" and "start or join a regular group". Weekly "we're coming" plans give
+routine and accountability for free. A one-off group is an event (later).
+
+**Decided**
+1. **Who can start one:** anyone who follows the park.
+2. **Who runs it:** the household that started it (edits it, and later approves requests).
+3. **Open groups only at launch.** Invite-only groups will probably be a premium feature.
+4. **No size limit** to start.
+5. **A shared group chat.** This changes the "no messaging between people" rule (2026-10-17). Proposed shape, not yet confirmed:
+   - members only; no direct messages;
+   - messages signed by the dog with the owner's first name ("Biscuit (Ana)"), shown inside the group only, which matches the profile's promise that a first name is seen only inside a plan you share;
+   - text only to start (no photos or links);
+   - quick actions: running late, not coming this week, cancelled this week.
+6. **Safety and fit:** deferred, except a proposed minimum for chat from day one: report a message (to the review queue), mute a member (private), leave the group.
+
+**Proposed, not yet decided**
+- **Parts:** park, weekly time(s), name about the dogs and play (no people's names), play tags, which dogs; open to newcomers or nothing.
+- **Find:**
+  - the park page lists its groups;
+  - matches suggest groups whose time overlaps your free times and whose tags fit your dog;
+  - a one-dog group shows as "looking for more" (cold start).
+- **Join:** an open group is one tap, with your dog(s).
+- **Visible:** counts and the description for everyone; which dogs for followers and members.
+
+**Open questions**
+- Chat signature: dog + first name, dog only, or first name only?
+- Chat history: keep it all, or expire messages (e.g. after 30 days)?
+- Co-runners, or handing a group over when its runner leaves.
+- Safety and fit (#6): removing a dog, private fit notes, bans.
+
 ## How they feed each other
 
 1. **Available → Planned.** Overlapping windows at a shared park become a suggestion
