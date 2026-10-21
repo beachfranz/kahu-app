@@ -11,6 +11,7 @@ Database + pipeline: the `kahu-dog-park` repo next to this one (Supabase `zncqyj
 - Details and decisions: `docs/presence.md`.
 
 ## Next
+0. Intent decided 2026-10-21 (`docs/presence.md` → Intent first): top = playmate / socialize and build / find a group; next to design: groups, then open to play.
 1. Events ("puppy socialization", "high energy chasers meet"): design questions in `docs/presence.md` under "Next: events".
 2. Open decisions for Franz: Pacific "today" for other time zones; custom SMTP (built-in email sends 2 codes/hour);
    Android Google Maps key; native device run (Expo Go / dev build); play feedback, notifications, blocking / reporting.
