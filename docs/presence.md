@@ -99,8 +99,12 @@ routine and accountability for free. A one-off group is an event (later).
 - Chat technology: **decided (A)**: our own messages table + Supabase Realtime + an open-source chat screen (react-native-gifted-chat or similar); members-only RLS; reports into the review queue. A hosted service (Stream) stays the fallback if chat grows into threads / reactions / auto-moderation. Push notifications stay parked (alerts recorded only).
 - Co-runners, or handing a group over when its runner leaves.
 - Safety and fit (#6): removing a dog, private fit notes, bans.
-- Size and energy matching rule. Proposed: a group's sizes must include the dog's size, and its energy must be the same or one step away. Dog-to-dog matches use the same rule. Puppies and slow-intros dogs prefer low or medium energy.
-- Required size / energy on existing profiles: ask on the next visit to My dogs, or block joining groups until set?
+- Size and energy matching rule: **decided** (2026-10-21).
+  - A group's sizes must include the dog's size.
+  - Its energy must be the same as the dog's or one step away (a medium dog fits low and high groups; a high dog doesn't fit a low one).
+  - Dog-to-dog matches use the same rule.
+  - Puppies and slow-intros dogs lean to low and medium energy.
+- Existing profiles without size or energy: **decided**. Ask on the next visit to My dogs; joining a group is blocked until both are set.
 
 ## How they feed each other
 
