@@ -5,6 +5,7 @@ import { ActivityIndicator, Image, Pressable, ScrollView, StyleSheet, Text, View
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { FaceStack } from '@/components/DogFace';
 import { Button, Field } from '@/components/Form';
+import { SizeEnergyPrompt } from '@/components/SizeEnergyPrompt';
 import {
   availabilityMatches, clock, dayWord, hhmm, myPresence, TAGS, WEEKDAY_NAME, type Match, type MyPresence,
 } from '@/lib/presence';
@@ -47,6 +48,9 @@ export default function MyDogs() {
                   <Text style={s.linkText}>Edit</Text>
                 </Pressable>
               </View>
+              {profile.dogs.filter((d) => !d.size_band || !d.energy).map((d) => (
+                <SizeEnergyPrompt key={`need-${d.id}`} dog={d} onSaved={(p) => setProfile(p)} />
+              ))}
               <Text style={s.h2} accessibilityRole="header">Your dogs</Text>
               {profile.dogs.length === 0 ? (
                 <View style={s.empty}>

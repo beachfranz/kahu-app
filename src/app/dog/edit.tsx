@@ -106,7 +106,10 @@ export default function EditDog() {
           {FLAGS.map(([k, l]) => <Toggle key={k} label={l} value={d[k] === true} onChange={(v) => set(k, v)} />)}
         </View>
 
-        <Button label={busy ? 'Saving…' : 'Save'} onPress={save} disabled={!d.name.trim() || !birthOk || busy} />
+        {!d.size_band || !d.energy ? (
+          <Text style={s.need}>Pick a size and an energy level: they decide which dogs and groups suit {d.name.trim() || 'your dog'}.</Text>
+        ) : null}
+        <Button label={busy ? 'Saving…' : 'Save'} onPress={save} disabled={!d.name.trim() || !birthOk || !d.size_band || !d.energy || busy} />
         {d.id ? <Button label="Remove this dog" kind="danger" onPress={remove} disabled={busy} /> : null}
         {msg ? <Text style={s.error}>{msg}</Text> : null}
       </ScrollView>
@@ -131,4 +134,5 @@ const s = StyleSheet.create({
   label: { fontFamily: F.heavy, fontSize: 14, color: C.text },
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted },
   error: { fontFamily: F.semibold, fontSize: 14, color: '#A33A2B' },
+  need: { fontFamily: F.semibold, fontSize: 14, color: C.muted, lineHeight: 20 },
 });

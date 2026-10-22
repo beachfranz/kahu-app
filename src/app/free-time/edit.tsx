@@ -5,17 +5,12 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, MultiChips } from '@/components/Form';
 import { Icon } from '@/components/Icon';
+import { TimeRow } from '@/components/TimeRow';
 import {
-  deleteAvailability, hhmm, localTz, myPresence, saveAvailability, TAGS, WEEKDAYS, type MyPresence,
+  deleteAvailability, localTz, myPresence, saveAvailability, TAGS, WEEKDAYS, type MyPresence,
 } from '@/lib/presence';
 import { myProfile, useSession, type Dog } from '@/lib/social';
 import { C, F } from '@/lib/theme';
-
-// Half-hour times from 5 am to 10 pm, as "HH:MM".
-const TIMES = Array.from({ length: 35 }, (_, i) => {
-  const m = 300 + i * 30;
-  return `${String(Math.floor(m / 60)).padStart(2, '0')}:${m % 60 ? '30' : '00'}`;
-});
 
 type Draft = { id?: string; dog_ids: string[]; park_ids: string[]; weekdays: string[]; start_local: string; end_local: string; tags: string[] };
 
@@ -107,26 +102,6 @@ export default function EditFreeTime() {
   );
 }
 
-function TimeRow({ label, value, onChange, min }: { label: string; value: string; onChange: (v: string) => void; min?: string }) {
-  return (
-    <View style={{ gap: 6 }}>
-      <Text style={s.label}>{label}</Text>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 8 }}
-                  accessibilityRole="radiogroup" accessibilityLabel={label}>
-        {TIMES.filter((t) => !min || t > min).map((t) => {
-          const on = t === value;
-          return (
-            <Pressable key={t} onPress={() => onChange(t)} style={[s.time, on && s.timeOn]}
-                       accessibilityRole="radio" accessibilityState={{ checked: on }}>
-              <Text style={[s.timeText, on && { color: '#FFFFFF' }]}>{hhmm(t)}</Text>
-            </Pressable>
-          );
-        })}
-      </ScrollView>
-    </View>
-  );
-}
-
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: C.bg },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: C.bg },
@@ -139,7 +114,4 @@ const s = StyleSheet.create({
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21 },
   note: { padding: 14, borderRadius: 16, backgroundColor: C.ask },
   error: { fontFamily: F.semibold, fontSize: 14, color: '#A33A2B' },
-  time: { height: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: C.lineStrong, justifyContent: 'center' },
-  timeOn: { backgroundColor: C.accent, borderColor: C.accent },
-  timeText: { fontFamily: F.bold, fontSize: 14, color: C.text },
 });

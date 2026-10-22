@@ -31,6 +31,14 @@ export const ICON = {
   book: 'M4 19V5a2 2 0 0 1 2-2h12v18H6a2 2 0 0 1-2-2zM8 7h6',
   heart: 'M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z',
   arrow: 'M5 12h14M13 6l6 6-6 6',
+  more: 'M5 12h.01M12 12h.01M19 12h.01',
+  people: 'M9 11m-3.5 0a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0-7 0M2.5 20c.6-3.4 3.3-5.5 6.5-5.5s5.9 2.1 6.5 5.5M16.5 4.5a3.5 3.5 0 0 1 0 7M18.5 14.8c1.7.8 2.8 2.6 3 5.2',
+  send: 'M4 12l16-8-6 16-2-6-8-2z',
+  flag: 'M5 21V4h11l-1.5 4L16 12H5',
+  mute: 'M4 9v6h4l5 4V5L8 9H4zM17 9l4 6M21 9l-4 6',
+  calendar: 'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
+  chevronDown: 'M6 9l6 6 6-6',
+  chevronUp: 'M6 15l6-6 6 6',
 };
 export type IconName = keyof typeof ICON;
 
