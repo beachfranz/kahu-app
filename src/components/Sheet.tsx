@@ -34,9 +34,9 @@ const s = StyleSheet.create({
   sheet: { position: 'absolute', left: 0, right: 0, bottom: 0, backgroundColor: C.bg, borderTopLeftRadius: 26,
            borderTopRightRadius: 26, paddingHorizontal: 22, paddingTop: 10, paddingBottom: 28, gap: 16,
            maxWidth: 640, alignSelf: 'center', width: '100%' },
-  grabber: { width: 40, height: 5, borderRadius: 3, backgroundColor: '#D3DAD4', alignSelf: 'center' },
+  grabber: { width: 40, height: 5, borderRadius: 3, backgroundColor: C.lineStrong, alignSelf: 'center' },
   head: { flexDirection: 'row', alignItems: 'flex-start', gap: 12 },
   title: { fontFamily: F.heavy, fontSize: 22, color: C.text },
   subtitle: { fontFamily: F.regular, fontSize: 14, color: C.muted, marginTop: 2 },
-  close: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
+  close: { width: 36, height: 36, borderRadius: 18, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
 });

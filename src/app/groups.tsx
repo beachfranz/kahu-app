@@ -61,7 +61,7 @@ export default function GroupsScreen() {
       <ScrollView contentContainerStyle={s.body}>
         {dogs.length > 1 ? (
           <View style={s.switcher}>
-            {dogs.map((d) => <FilterChip key={d.id} label={d.name} on={dog?.id === d.id} onPress={() => setDogId(d.id)} />)}
+            {dogs.map((d) => <FilterChip key={d.id} label={d.name} emoji="🐕" on={dog?.id === d.id} onPress={() => setDogId(d.id)} />)}
           </View>
         ) : null}
 
@@ -74,10 +74,10 @@ export default function GroupsScreen() {
 
         {active.length === 0 ? (
           <View style={s.empty}>
-            <Icon name="people" size={28} color={C.accent} width={2} />
+            <Text style={s.bigEmoji}>🐕🐾🐕</Text>
             <Text style={s.emptyTitle}>No groups meet here yet</Text>
-            <Text style={s.mutedCenter}>A group is a weekly meetup for dogs who play alike. Pick a day and a time, and other dogs who follow {name} can join.</Text>
-            <Button label="Start the first group" onPress={start} />
+            <Text style={s.mutedCenter}>A weekly meetup for dogs who play alike.</Text>
+            <Button label="Start the first group" block={false} onPress={start} />
           </View>
         ) : (
           <>
@@ -104,7 +104,7 @@ export default function GroupsScreen() {
                 {showOthers ? others.map((g) => <GroupCard key={g.id} group={g} dog={dog} />) : null}
               </View>
             ) : null}
-            <Button label="Start a group" kind="secondary" onPress={start} />
+            <Button label="Start a group" emoji="➕" kind="secondary" onPress={start} />
           </>
         )}
         {!session ? <Text style={s.mutedCenter}>Sign in on the My dogs tab to join or start a group.</Text> : null}
@@ -115,11 +115,11 @@ export default function GroupsScreen() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: C.bg },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: C.bg },
+  screen: { flex: 1, backgroundColor: C.page },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: C.page },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4,
          maxWidth: 640, width: '100%', alignSelf: 'center' },
-  round: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
+  round: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: F.heavy, fontSize: 22, color: C.text },
   body: { padding: 20, paddingTop: 8, gap: 20, maxWidth: 640, width: '100%', alignSelf: 'center', paddingBottom: 48 },
   switcher: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
@@ -128,8 +128,9 @@ const s = StyleSheet.create({
   h2: { fontFamily: F.heavy, fontSize: 18, color: C.text },
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21 },
   mutedCenter: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21, textAlign: 'center' },
-  empty: { alignItems: 'center', gap: 10, padding: 20, borderRadius: 20, borderWidth: 1, borderColor: C.line, borderStyle: 'dashed' },
-  emptyTitle: { fontFamily: F.heavy, fontSize: 18, color: C.text },
+  empty: { alignItems: 'center', gap: 8, padding: 20, borderRadius: 18, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg },
+  emptyTitle: { fontFamily: F.heavy, fontSize: 17, color: C.text },
+  bigEmoji: { fontSize: 30, letterSpacing: 2 },
   fold: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 },
   foldText: { fontFamily: F.heavy, fontSize: 15, color: C.muted },
   error: { fontFamily: F.semibold, fontSize: 14, color: '#A33A2B' },

@@ -8,6 +8,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { AmenityTile, type TileState } from '@/components/AmenityTile';
 import { Icon } from '@/components/Icon';
 import { FollowersCard } from '@/components/FollowersCard';
+import { Button } from '@/components/Form';
 import { PresenceCard } from '@/components/PresenceCard';
 import { SourceSheet } from '@/components/SourceSheet';
 import { answerQuestion, park as fetchPark, parksNear, type Attribute, type Park } from '@/lib/api';
@@ -147,16 +148,13 @@ export default function ParkScreen() {
             <Text style={s.h1} accessibilityRole="header">{p.name}</Text>
             <Text style={s.muted}>{[p.city, p.operator ? `run by ${p.operator.name}` : null].filter(Boolean).join(' · ')}</Text>
             <View style={s.openRow}>
-              <View style={[s.dot, { backgroundColor: open.open ? C.live : open.open === false ? '#C0392B' : C.faint }]} />
-              <Text style={[s.openText, { color: open.open ? C.accentDark : C.muted }]}>{open.label}</Text>
+              <View style={[s.dot, { backgroundColor: open.open ? C.live : open.open === false ? '#DC2626' : C.faint }]} />
+              <Text style={[s.openText, { color: open.open ? C.go : C.muted }]}>{open.label}</Text>
             </View>
             {by.hours_text ? <Text style={s.muted}>{String(by.hours_text.value)}</Text> : null}
           </View>
 
-          <Pressable style={s.primary} onPress={directions} accessibilityRole="button">
-            <Icon name="directions" size={20} color="#FFFFFF" width={2} />
-            <Text style={s.primaryText}>Directions</Text>
-          </Pressable>
+          <Button label="Directions" emoji="🧭" onPress={directions} />
 
           <PresenceCard parkId={p.id} parkName={p.name} onPresence={setPresence} />
           <FollowersCard parkId={p.id} presence={presence} />
@@ -175,7 +173,7 @@ export default function ParkScreen() {
               ) : null}
             </View>
             <View style={s.legend}>
-              <Legend color={C.yesBg} border={C.yesBorder} label="Yes" />
+              <Legend color={C.bg} border={C.lineStrong} label="Yes" />
               <Legend color={C.warnBg} border={C.warnBorder} label="Heads-up" />
               <Legend color={C.bg} border={C.dashed} label="Not listed" dashed />
               <Text style={s.small}>Tap a tile for its source</Text>
@@ -232,16 +230,16 @@ function Legend({ color, border, label, dashed }: { color: string; border: strin
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: C.bg },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: C.bg },
+  screen: { flex: 1, backgroundColor: C.page },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, backgroundColor: C.page },
   hero: { backgroundColor: C.photo },
   noPhoto: { height: 200, alignItems: 'center', justifyContent: 'center', backgroundColor: C.photo },
-  noPhotoText: { fontFamily: F.bold, fontSize: 15, color: C.accentDark },
+  noPhotoText: { fontFamily: F.bold, fontSize: 15, color: C.muted },
   heroButtons: { position: 'absolute', left: 0, right: 0, top: 0, flexDirection: 'row', justifyContent: 'space-between', padding: 16 },
   round: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center',
            shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
   credit: { position: 'absolute', left: 12, bottom: 10, maxWidth: '90%', paddingHorizontal: 9, paddingVertical: 4, borderRadius: 10,
-            backgroundColor: 'rgba(23,36,28,0.72)' },
+            backgroundColor: 'rgba(15,39,66,0.72)' },
   creditText: { fontFamily: F.semibold, fontSize: 11, color: '#FFFFFF' },
   body: { paddingHorizontal: 20, paddingTop: 18, gap: 18, maxWidth: 720, width: '100%', alignSelf: 'center' },
   h1: { fontFamily: F.heavy, fontSize: 26, lineHeight: 30, color: C.text },
@@ -251,8 +249,6 @@ const s = StyleSheet.create({
   openRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   dot: { width: 8, height: 8, borderRadius: 4 },
   openText: { fontFamily: F.heavy, fontSize: 15 },
-  primary: { height: 48, borderRadius: 24, backgroundColor: C.accent, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8 },
-  primaryText: { fontFamily: F.heavy, fontSize: 16, color: '#FFFFFF' },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   legend: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 12 },
   row: { paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: C.line, gap: 2 },
@@ -262,7 +258,7 @@ const s = StyleSheet.create({
   askTitle: { fontFamily: F.heavy, fontSize: 16, color: C.text },
   askQ: { fontFamily: F.regular, fontSize: 15, color: C.text },
   askRow: { flexDirection: 'row', gap: 8 },
-  askBtn: { flex: 1, height: 44, borderRadius: 22, borderWidth: 1, borderColor: C.askBorder, backgroundColor: '#FFFFFF',
+  askBtn: { flex: 1, height: 38, borderRadius: 19, borderWidth: 1, borderColor: C.askBorder, backgroundColor: '#FFFFFF',
             alignItems: 'center', justifyContent: 'center' },
-  askBtnText: { fontFamily: F.heavy, fontSize: 15, color: C.text },
+  askBtnText: { fontFamily: F.heavy, fontSize: 14, color: C.text },
 });

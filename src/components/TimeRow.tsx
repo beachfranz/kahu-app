@@ -39,7 +39,7 @@ export function TimeRow({ label, value, onChange, min }: { label: string; value:
 
 const s = StyleSheet.create({
   label: { fontFamily: F.heavy, fontSize: 14, color: C.text },
-  time: { height: 40, paddingHorizontal: 14, borderRadius: 20, borderWidth: 1, borderColor: C.lineStrong, justifyContent: 'center' },
-  timeOn: { backgroundColor: C.accent, borderColor: C.accent },
-  timeText: { fontFamily: F.bold, fontSize: 14, color: C.text },
+  time: { height: 34, paddingHorizontal: 12, borderRadius: 17, borderWidth: 1, borderColor: C.lineStrong, backgroundColor: C.bg, justifyContent: 'center' },
+  timeOn: { backgroundColor: C.text, borderColor: C.text },
+  timeText: { fontFamily: F.bold, fontSize: 13, color: C.text },
 });

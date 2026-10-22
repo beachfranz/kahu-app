@@ -1,8 +1,7 @@
-// A park on find, under the map: its number (matches the pin), name, hours, big / small dog areas, how many
-// dogs follow it (always shown, zero too), how many are heading there today, and when it's busy.
+// A park on find, under the map: a photo (its number, matching the pin, on the corner), name, distance, hours,
+// big / small dog areas, how many dogs follow it, how many are heading there today, and when it's busy.
 import { Link } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Icon } from './Icon';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { ParkSummary } from '@/lib/api';
 import { openState } from '@/lib/hours';
 import { busyLabel, type Busy, type Counts } from '@/lib/presence';
@@ -18,48 +17,38 @@ export function ParkCard({ park, n, km, counts, busy }:
   const peak = busyLabel(busy);
   const max = busy ? Math.max(1, ...busy.hours) : 1;
   const dist = km < 10 ? km.toFixed(1) : String(Math.round(km));
+  const photo = park.photo?.thumb_url ?? park.photo?.url;
   return (
     <Link href={{ pathname: '/park/[id]', params: { id: String(park.id) } }} asChild>
-      <Pressable style={s.card} accessibilityRole="link" accessibilityLabel={`${n}. ${park.name}, ${dist} km, ${open.label}`}>
-        <View style={s.num}><Text style={s.numText}>{n}</Text></View>
+      <Pressable style={s.card} accessibilityRole="link"
+                 accessibilityLabel={`${n}. ${park.name}, ${dist} km, ${open.label}. ${dogs} ${dogs === 1 ? 'dog follows' : 'dogs follow'}.`}>
+        <View style={s.thumb}>
+          {photo ? <Image source={{ uri: photo }} style={s.img} resizeMode="cover" accessibilityIgnoresInvertColors />
+            : <Text style={s.noImg}>🐕</Text>}
+          <View style={s.num}><Text style={s.numText}>{n}</Text></View>
+        </View>
         <View style={s.body}>
           <View style={s.titleRow}>
             <Text style={s.name} numberOfLines={1}>{park.name}</Text>
             <Text style={s.dist}>{dist} km</Text>
           </View>
-          <View style={[s.follow, dogs ? s.followOn : s.followZero]}
-                accessibilityLabel={`${dogs} ${dogs === 1 ? 'dog follows' : 'dogs follow'} this park`}>
-            <Icon name="offleash" size={16} color={dogs ? '#FFFFFF' : C.faint} width={2.1} />
-            <Text style={[s.followN, { color: dogs ? '#FFFFFF' : C.muted }]}>{dogs}</Text>
-            <Text style={[s.followL, { color: dogs ? '#FFFFFF' : C.muted }]}>{dogs === 1 ? 'dog follows' : 'dogs follow'}</Text>
-          </View>
-          <Text style={[s.hours, { color: open.open ? C.accentDark : C.muted }]} numberOfLines={1}>{open.label}</Text>
+          <Text style={[s.hours, { color: open.open ? C.go : C.muted }]} numberOfLines={1}>{open.label}</Text>
           <View style={s.stats}>
-            <View style={s.stat} accessibilityLabel={big ? 'Big dogs welcome' : 'Big-dog area not listed'}>
-              <Icon name="big" size={18} color={big ? C.text : C.dashed} width={1.9} />
-              <Text style={[s.statText, !big && s.off]}>Big</Text>
-            </View>
-            <View style={s.stat} accessibilityLabel={small ? 'Small-dog area' : 'Small-dog area not listed'}>
-              <Icon name="small" size={18} color={small ? C.text : C.dashed} width={1.9} />
-              <Text style={[s.statText, !small && s.off]}>Small</Text>
-            </View>
-            <View style={s.stat} accessibilityLabel={`${today} heading there today`}>
-              <Icon name="arrow" size={15} color={today ? C.warnIcon : C.faint} width={2.2} />
-              <Text style={[s.statText, { color: today ? C.warnIcon : C.faint }]}>{today} today</Text>
-            </View>
+            {big ? <Text style={s.stat}>🐕‍🦺 Big</Text> : null}
+            {small ? <Text style={s.stat}>🐩 Small</Text> : null}
+            <Text style={[s.stat, !dogs && s.off]} accessibilityElementsHidden>🐾 {dogs}</Text>
+            {today ? <Text style={[s.stat, { color: C.warnIcon }]}>📍 {today} today</Text> : null}
           </View>
-          <View style={s.busyRow}>
-            {peak && busy ? (
-              <View style={s.bars} accessibilityLabel={`Busiest ${peak}`}>
+          {peak && busy ? (
+            <View style={s.busyRow} accessibilityLabel={`Busiest ${peak}`}>
+              <View style={s.bars}>
                 {busy.hours.map((v, i) => (
-                  <View key={i} style={[s.bar, { height: Math.max(2, (v / max) * 16), backgroundColor: v === max ? C.accent : '#B7D9BC' }]} />
+                  <View key={i} style={[s.bar, { height: Math.max(2, (v / max) * 14), backgroundColor: v === max ? C.accent : '#BAE6FD' }]} />
                 ))}
               </View>
-            ) : null}
-            <Text style={s.busyText}>
-              {peak ? <>Busy <Text style={{ fontFamily: F.heavy, color: C.text }}>{peak}</Text></> : 'Busy times: not enough check-ins yet'}
-            </Text>
-          </View>
+              <Text style={s.busyText}>Busy <Text style={{ fontFamily: F.heavy, color: C.text }}>{peak}</Text></Text>
+            </View>
+          ) : null}
         </View>
       </Pressable>
     </Link>
@@ -67,25 +56,23 @@ export function ParkCard({ park, n, km, counts, busy }:
 }
 
 const s = StyleSheet.create({
-  card: { flexDirection: 'row', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg },
-  num: { width: 26, height: 26, borderRadius: 13, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center' },
-  numText: { fontFamily: F.heavy, fontSize: 13, color: '#FFFFFF' },
-  body: { flex: 1, minWidth: 0, gap: 5 },
+  card: { flexDirection: 'row', gap: 12, padding: 10, borderRadius: 16, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg },
+  thumb: { width: 76, height: 76, borderRadius: 12, overflow: 'hidden', backgroundColor: C.photo, alignItems: 'center', justifyContent: 'center' },
+  img: { width: 76, height: 76 },
+  noImg: { fontSize: 28, opacity: 0.6 },
+  num: { position: 'absolute', top: 4, left: 4, minWidth: 22, height: 22, borderRadius: 11, paddingHorizontal: 5, backgroundColor: C.accent,
+         borderWidth: 1.5, borderColor: '#FFFFFF', alignItems: 'center', justifyContent: 'center' },
+  numText: { fontFamily: F.heavy, fontSize: 11, color: '#FFFFFF' },
+  body: { flex: 1, minWidth: 0, gap: 4, justifyContent: 'center' },
   titleRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8 },
-  name: { flex: 1, fontFamily: F.heavy, fontSize: 16, color: C.text },
+  name: { flex: 1, fontFamily: F.heavy, fontSize: 15, color: C.text },
   dist: { fontFamily: F.bold, fontSize: 12, color: C.muted },
   hours: { fontFamily: F.bold, fontSize: 13 },
-  follow: { flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 5, height: 28, paddingHorizontal: 10, borderRadius: 14 },
-  followOn: { backgroundColor: C.accent },
-  followZero: { backgroundColor: C.bg, borderWidth: 1.5, borderStyle: 'dashed', borderColor: C.dashed },
-  followN: { fontFamily: F.heavy, fontSize: 15 },
-  followL: { fontFamily: F.bold, fontSize: 13 },
-  stats: { flexDirection: 'row', alignItems: 'center', gap: 12, flexWrap: 'wrap' },
-  stat: { flexDirection: 'row', alignItems: 'center', gap: 4 },
-  statText: { fontFamily: F.heavy, fontSize: 13, color: C.text },
+  stats: { flexDirection: 'row', alignItems: 'center', gap: 10, flexWrap: 'wrap' },
+  stat: { fontFamily: F.bold, fontSize: 12.5, color: C.text },
   off: { color: C.faint },
   busyRow: { flexDirection: 'row', alignItems: 'flex-end', gap: 8 },
-  bars: { flexDirection: 'row', alignItems: 'flex-end', gap: 2, height: 16 },
-  bar: { width: 5, borderTopLeftRadius: 2, borderTopRightRadius: 2 },
+  bars: { flexDirection: 'row', alignItems: 'flex-end', gap: 2, height: 14 },
+  bar: { width: 4, borderTopLeftRadius: 2, borderTopRightRadius: 2 },
   busyText: { fontFamily: F.regular, fontSize: 12, color: C.muted },
 });

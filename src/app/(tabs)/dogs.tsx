@@ -255,7 +255,7 @@ function Together({ dogs }: { dogs: Dog[] }) {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: C.bg },
+  screen: { flex: 1, backgroundColor: C.page },
   body: { padding: 20, gap: 16, maxWidth: 640, width: '100%', alignSelf: 'center' },
   h1: { fontFamily: F.heavy, fontSize: 26, lineHeight: 30, color: C.text },
   h2: { fontFamily: F.heavy, fontSize: 18, color: C.text, marginTop: 4 },
@@ -266,9 +266,9 @@ const s = StyleSheet.create({
   link: { paddingVertical: 10, paddingHorizontal: 4, minHeight: 44, justifyContent: 'center' },
   linkText: { fontFamily: F.heavy, fontSize: 15, color: C.accent },
   codeInput: { fontSize: 24, letterSpacing: 8, fontFamily: F.heavy },
-  empty: { padding: 16, borderRadius: 18, backgroundColor: C.surface, gap: 6 },
+  empty: { padding: 16, borderRadius: 18, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, gap: 6 },
   emptyTitle: { fontFamily: F.heavy, fontSize: 16, color: C.text },
-  dog: { flexDirection: 'row', gap: 14, padding: 12, borderRadius: 18, borderWidth: 1, borderColor: C.line, alignItems: 'center' },
+  dog: { flexDirection: 'row', gap: 14, padding: 12, borderRadius: 18, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, alignItems: 'center' },
   dogPhoto: { width: 72, height: 72, borderRadius: 36, backgroundColor: C.photo },
   dogInitial: { alignItems: 'center', justifyContent: 'center', backgroundColor: C.yesBg },
   initial: { fontFamily: F.heavy, fontSize: 26, color: C.accentDark },
@@ -276,7 +276,7 @@ const s = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { paddingHorizontal: 9, height: 24, borderRadius: 12, backgroundColor: C.yesBg, justifyContent: 'center' },
   chipText: { fontFamily: F.heavy, fontSize: 12, color: C.accentDark },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: C.line, minHeight: 56 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12, borderRadius: 16, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, minHeight: 52 },
   rowTitle: { fontFamily: F.heavy, fontSize: 15, color: C.text },
   liveDot: { width: 10, height: 10, borderRadius: 5 },
 });

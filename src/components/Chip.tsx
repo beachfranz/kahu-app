@@ -1,36 +1,38 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
-import { Icon } from './Icon';
-import type { IconName } from '@/lib/icons';
+import { EMOJI, type IconName } from '@/lib/icons';
 import { C, F } from '@/lib/theme';
 
-// Filter chip (toggle).
-export function FilterChip({ label, on, onPress }: { label: string; on: boolean; onPress: () => void }) {
+// Filter chip (toggle): white with an emoji, navy when on.
+export function FilterChip({ label, on, onPress, emoji }: { label: string; on: boolean; onPress: () => void; emoji?: string }) {
   return (
-    <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }}
-               style={[s.filter, on && s.filterOn]}>
+    <Pressable onPress={onPress} accessibilityRole="button" accessibilityState={{ selected: on }} accessibilityLabel={label}
+               hitSlop={{ top: 5, bottom: 5 }} style={[s.filter, on && s.filterOn]}>
+      {emoji ? <Text style={s.emoji}>{emoji}</Text> : null}
       <Text style={[s.filterText, on && s.filterTextOn]}>{label}</Text>
     </Pressable>
   );
 }
 
-// Compact amenity chip on find cards: icon + label. Inferred values are dashed and say "likely".
+// Compact amenity chip on find cards: emoji + label. Inferred values are dashed and say "likely".
 export function AmenityChip({ icon, label, inferred }: { icon: IconName; label: string; inferred?: boolean }) {
   return (
     <View style={[s.amenity, inferred && s.amenityInferred]}>
-      <Icon name={icon} size={15} color={inferred ? C.muted : C.accentDark} width={2} />
+      <Text style={[s.amenityEmoji, inferred && { opacity: 0.55 }]}>{EMOJI[icon] ?? '•'}</Text>
       <Text style={[s.amenityText, inferred && { color: C.muted }]}>{label}{inferred ? ' (likely)' : ''}</Text>
     </View>
   );
 }
 
 const s = StyleSheet.create({
-  filter: { height: 36, paddingHorizontal: 14, borderRadius: 18, borderWidth: 1, borderColor: C.lineStrong,
-            backgroundColor: C.bg, justifyContent: 'center' },
-  filterOn: { backgroundColor: C.accent, borderColor: C.accent },
-  filterText: { fontFamily: F.bold, fontSize: 14, color: C.text },
+  filter: { height: 34, paddingHorizontal: 12, borderRadius: 17, borderWidth: 1, borderColor: C.lineStrong,
+            backgroundColor: C.bg, flexDirection: 'row', alignItems: 'center', gap: 5 },
+  filterOn: { backgroundColor: C.text, borderColor: C.text },
+  emoji: { fontSize: 14 },
+  filterText: { fontFamily: F.bold, fontSize: 13, color: C.text },
   filterTextOn: { color: '#FFFFFF' },
-  amenity: { height: 24, paddingLeft: 5, paddingRight: 7, borderRadius: 7, borderWidth: 1, borderColor: C.yesBorder,
-             backgroundColor: C.yesBg, flexDirection: 'row', alignItems: 'center', gap: 4 },
+  amenity: { height: 24, paddingLeft: 5, paddingRight: 8, borderRadius: 12, borderWidth: 1, borderColor: C.line,
+             backgroundColor: C.surface, flexDirection: 'row', alignItems: 'center', gap: 4 },
   amenityInferred: { backgroundColor: C.bg, borderColor: C.dashed, borderStyle: 'dashed' },
-  amenityText: { fontFamily: F.heavy, fontSize: 11, color: C.accentDark },
+  amenityEmoji: { fontSize: 12 },
+  amenityText: { fontFamily: F.bold, fontSize: 11, color: C.text },
 });

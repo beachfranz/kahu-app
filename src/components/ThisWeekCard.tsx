@@ -53,15 +53,15 @@ export function ThisWeekCard({ group: g, busy, onToggle }:
 }
 
 const s = StyleSheet.create({
-  card: { padding: 16, borderRadius: 20, backgroundColor: C.accentSoft, borderWidth: 1, borderColor: C.yesBorder, gap: 12 },
+  card: { padding: 14, borderRadius: 18, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, gap: 12 },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 10 },
   h2: { fontFamily: F.heavy, fontSize: 18, color: C.text },
-  count: { fontFamily: F.heavy, fontSize: 14, color: C.accentDark },
+  count: { fontFamily: F.heavy, fontSize: 13, color: C.go },
   faces: { flexDirection: 'row', flexWrap: 'wrap', gap: 12 },
   face: { width: 64, alignItems: 'center', gap: 4, minHeight: 44 },
   ring: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
-  ringOn: { borderWidth: 3, borderColor: C.accent },
-  ringOff: { borderWidth: 2, borderStyle: 'dashed', borderColor: '#9FB3A6', backgroundColor: C.bg },
+  ringOn: { borderWidth: 3, borderColor: C.go },
+  ringOff: { borderWidth: 2, borderStyle: 'dashed', borderColor: C.faint, backgroundColor: C.surface },
   initial: { fontFamily: F.heavy, fontSize: 18, color: C.faint },
   name: { fontFamily: F.heavy, fontSize: 12, color: C.text, maxWidth: 64 },
   muted: { fontFamily: F.regular, fontSize: 14, color: C.muted, lineHeight: 20 },

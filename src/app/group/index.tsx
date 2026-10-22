@@ -13,6 +13,7 @@ import { confirmAction } from '@/lib/confirm';
 import {
   areaWord, closeGroup, energyWord, groupDetail, leaveGroup, loneDog, setAttendance, sizesWord, skipWeek, whenLine, type GroupDetail,
 } from '@/lib/groups';
+import { ENERGY_EMOJI, SIZE_EMOJI, TAG_EMOJI } from '@/lib/icons';
 import { TAGS } from '@/lib/presence';
 import { myProfile, useSession, type Profile } from '@/lib/social';
 import { C, F } from '@/lib/theme';
@@ -76,7 +77,7 @@ export default function GroupScreen() {
   };
 
   const dogs = profile?.dogs ?? [];
-  const tagWords = TAGS.filter(([k]) => g.tags.includes(k)).map(([, l]) => l);
+  const tagWords = TAGS.filter(([k]) => g.tags.includes(k)).map(([k, l]) => `${TAG_EMOJI[k] ?? ''} ${l}`.trim());
   const runner = g.runner_dog ? `Run by ${g.runner_dog}${g.runner_first_name ? ` (${g.runner_first_name})` : ''}` : null;
 
   return (
@@ -103,10 +104,10 @@ export default function GroupScreen() {
           {runner ? <Text style={s.muted}>{runner}</Text> : null}
         </View>
         <View style={s.chips}>
-          <View style={s.chip}><Text style={s.chipText}>{sizesWord(g.sizes)}</Text></View>
-          <View style={s.chip}><Text style={s.chipText}>{energyWord(g.energy)}</Text></View>
+          <View style={s.chip}><Text style={s.chipText}>{SIZE_EMOJI} {sizesWord(g.sizes)}</Text></View>
+          <View style={s.chip}><Text style={s.chipText}>{ENERGY_EMOJI[g.energy]} {energyWord(g.energy)}</Text></View>
           {tagWords.map((t) => <View key={t} style={s.chip}><Text style={s.chipText}>{t}</Text></View>)}
-          {g.open_to_play ? <View style={[s.chip, s.chipGreen]}><Text style={[s.chipText, { color: C.accentDark }]}>Newcomers welcome</Text></View> : null}
+          {g.open_to_play ? <View style={s.chip}><Text style={s.chipText}>👋 Newcomers welcome</Text></View> : null}
         </View>
         {g.note ? <Text style={s.note}>{g.note}</Text> : null}
 
@@ -142,7 +143,6 @@ export default function GroupScreen() {
             <Button label="Join" onPress={() => setJoining(true)} />
           ) : null
         ) : null}
-        {!g.is_member && g.status !== 'closed' ? <Text style={s.small}>Members see who’s coming each week and the group chat.</Text> : null}
 
         {msg ? <Text style={s.error} accessibilityLiveRegion="polite">{msg}</Text> : null}
       </ScrollView>
@@ -171,27 +171,26 @@ export default function GroupScreen() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: C.bg },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16, backgroundColor: C.bg },
+  screen: { flex: 1, backgroundColor: C.page },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16, backgroundColor: C.page },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4,
          maxWidth: 640, width: '100%', alignSelf: 'center' },
-  round: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
+  round: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   title: { flex: 1, fontFamily: F.heavy, fontSize: 22, color: C.text },
   body: { padding: 20, paddingTop: 8, gap: 16, maxWidth: 640, width: '100%', alignSelf: 'center', paddingBottom: 48 },
-  line: { fontFamily: F.semibold, fontSize: 16, color: C.text },
+  line: { fontFamily: F.bold, fontSize: 15, color: C.text },
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21 },
   small: { fontFamily: F.regular, fontSize: 13, color: C.muted, textAlign: 'center' },
   link: { fontFamily: F.bold, color: C.accent },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
-  chip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 10, backgroundColor: C.surface },
-  chipGreen: { backgroundColor: C.yesBg },
+  chip: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line },
   chipText: { fontFamily: F.bold, fontSize: 13, color: C.text },
   note: { fontFamily: F.regular, fontSize: 15, color: C.text, lineHeight: 21 },
-  banner: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', padding: 14, borderRadius: 16, borderWidth: 1, borderColor: C.line },
+  banner: { flexDirection: 'row', gap: 10, alignItems: 'flex-start', padding: 14, borderRadius: 16, borderWidth: 1, borderColor: C.warnBorder, backgroundColor: C.warnBg },
   bannerText: { flex: 1, fontFamily: F.regular, fontSize: 14, color: C.text, lineHeight: 20 },
   members: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   error: { fontFamily: F.semibold, fontSize: 14, color: '#A33A2B' },
-  menuRow: { minHeight: 52, justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: C.line },
-  menuText: { fontFamily: F.heavy, fontSize: 16, color: C.text },
+  menuRow: { minHeight: 48, justifyContent: 'center', borderBottomWidth: 1, borderBottomColor: C.line },
+  menuText: { fontFamily: F.bold, fontSize: 15, color: C.text },
   danger: { color: '#A33A2B' },
 });

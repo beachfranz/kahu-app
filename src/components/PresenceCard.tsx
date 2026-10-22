@@ -143,12 +143,12 @@ export function PresenceCard({ parkId, parkName, onPresence }:
           ) : (
             <View style={s.btnRow}>
               <Pressable style={[s.primary, { flex: 1 }, (!chosen.length || busy) && s.off]} disabled={!chosen.length || busy}
-                         onPress={() => act(() => checkIn(parkId, who))} accessibilityRole="button">
-                <Text style={s.primaryText}>We’re here</Text>
+                         onPress={() => act(() => checkIn(parkId, who))} accessibilityRole="button" accessibilityLabel="We’re here">
+                <Text style={s.primaryText}>📍 We’re here</Text>
               </Pressable>
               <Pressable style={[s.secondary, { flex: 1 }, (!chosen.length || busy) && s.off]} disabled={!chosen.length || busy}
-                         onPress={() => setPlan(true)} accessibilityRole="button">
-                <Text style={s.secondaryText}>We’ll be here</Text>
+                         onPress={() => setPlan(true)} accessibilityRole="button" accessibilityLabel="We’ll be here">
+                <Text style={s.secondaryText}>📅 We’ll be here</Text>
               </Pressable>
             </View>
           )}
@@ -182,7 +182,7 @@ function Count({ n, label, live }: { n: number; label: string; live?: boolean })
 }
 
 const s = StyleSheet.create({
-  card: { padding: 16, borderRadius: 20, backgroundColor: C.accentSoft, gap: 14, borderWidth: 1, borderColor: C.yesBorder },
+  card: { padding: 14, borderRadius: 18, backgroundColor: C.bg, gap: 12, borderWidth: 1, borderColor: C.line },
   head: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 },
   h2: { fontFamily: F.heavy, fontSize: 18, color: C.text },
   follow: { flexDirection: 'row', alignItems: 'center', gap: 4, height: 34, paddingHorizontal: 14, borderRadius: 17, backgroundColor: C.accent },
@@ -205,11 +205,12 @@ const s = StyleSheet.create({
   small: { fontFamily: F.regular, fontSize: 12, color: C.muted },
   error: { fontFamily: F.semibold, fontSize: 14, color: '#A33A2B' },
   btnRow: { flexDirection: 'row', gap: 10 },
-  primary: { height: 48, borderRadius: 24, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 16 },
-  primaryText: { fontFamily: F.heavy, fontSize: 16, color: '#FFFFFF' },
-  secondary: { height: 48, borderRadius: 24, borderWidth: 1.5, borderColor: C.accent, backgroundColor: C.bg, alignItems: 'center',
-               justifyContent: 'center', paddingHorizontal: 16 },
-  secondaryText: { fontFamily: F.heavy, fontSize: 16, color: C.accent },
+  primary: { height: 40, borderRadius: 20, backgroundColor: C.accent, flexDirection: 'row', gap: 6, alignItems: 'center',
+             justifyContent: 'center', paddingHorizontal: 14 },
+  primaryText: { fontFamily: F.heavy, fontSize: 14, color: '#FFFFFF' },
+  secondary: { height: 40, borderRadius: 20, borderWidth: 1, borderColor: C.lineStrong, backgroundColor: C.bg, flexDirection: 'row', gap: 6,
+               alignItems: 'center', justifyContent: 'center', paddingHorizontal: 14 },
+  secondaryText: { fontFamily: F.heavy, fontSize: 14, color: C.text },
   off: { opacity: 0.5 },
   whoRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
   who: { height: 34, paddingHorizontal: 12, borderRadius: 17, borderWidth: 1, borderColor: C.lineStrong, backgroundColor: C.bg, justifyContent: 'center' },

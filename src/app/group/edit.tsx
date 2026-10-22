@@ -128,7 +128,6 @@ export default function EditGroup() {
         </View>
       </View>
       <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
-        {!d.id ? <Text style={s.muted}>A weekly meetup for dogs who play alike. You run it; other dogs who fit can join.</Text> : null}
         <Field label="Name" value={d.name} maxLength={40} onChangeText={(v) => setD({ ...d, name: v, named: true })} />
         <MultiChips label="Days" options={WEEKDAYS} value={d.weekdays} onChange={(v) => set('weekdays', v)} />
         <TimeRow label="Starts" value={d.start_local} onChange={(v) => set('start_local', v)} />
@@ -172,11 +171,11 @@ export default function EditGroup() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: C.bg },
-  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16, backgroundColor: C.bg },
+  screen: { flex: 1, backgroundColor: C.page },
+  center: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 24, gap: 16, backgroundColor: C.page },
   top: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 4,
          maxWidth: 640, width: '100%', alignSelf: 'center' },
-  round: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
+  round: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: F.heavy, fontSize: 22, color: C.text },
   body: { padding: 20, gap: 18, maxWidth: 640, width: '100%', alignSelf: 'center', paddingBottom: 48 },
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21 },

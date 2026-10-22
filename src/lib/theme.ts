@@ -1,28 +1,32 @@
-// "Park morning": white ground, sage surfaces, one grass-green accent, Nunito.
+// Palette borrowed from Dog Beach Scout: a cool blue-grey ground, white cards, navy ink, one ocean-blue accent.
+// Green is a status colour only (open, fits, coming, here now), never a surface. Nunito.
 import { Platform } from 'react-native';
 
 export const C = {
-  bg: '#FFFFFF',
-  surface: '#F2F5F0',
-  line: '#E4E9E2',
-  lineStrong: '#DDE3DC',
-  text: '#17241C',
-  muted: '#55635A',
-  faint: '#8A968E',
-  accent: '#2E7D4F',
-  accentDark: '#1F5E39',
-  accentSoft: '#F2F8F4',
-  live: '#2E9E5B',
-  yesBg: '#E3F1E8',
-  yesBorder: '#C5E1CF',
-  warnBg: '#FFF1CC',
-  warnBorder: '#EBD38E',
-  warnIcon: '#8A5A00',
-  dashed: '#C3CDC6',
-  ask: '#FFF8E1',
-  askBorder: '#E5D9A8',
-  photo: '#CFE3D4',
-  scrim: 'rgba(23,36,28,0.45)',
+  page: '#EEF4F8',        // screen ground
+  bg: '#FFFFFF',          // cards, sheets, inputs
+  surface: '#F1F5F9',     // sunk chips, round buttons
+  line: '#E2ECF3',
+  lineStrong: '#D1DDE8',
+  text: '#0F2742',        // navy ink; also the fill of a selected chip
+  muted: '#5B6B7D',
+  faint: '#94A3B8',
+  accent: '#0369A1',      // actions, links, the map pins
+  accentDark: '#075985',
+  accentSoft: '#F5F9FC',  // a quiet tint inside a white card
+  go: '#15803D',          // status: open, fits, coming
+  goBg: '#DCFCE7',
+  live: '#16A34A',        // the here-now dot
+  yesBg: '#E0F2FE',       // dog initials, small info badges
+  yesBorder: '#D1DDE8',
+  warnBg: '#FFEDD5',
+  warnBorder: '#FDBA74',
+  warnIcon: '#B45309',
+  dashed: '#C7D3DE',
+  ask: '#FFF7E6',
+  askBorder: '#F2D9A6',
+  photo: '#D1DDE8',
+  scrim: 'rgba(15,39,66,0.45)',
 };
 
 // On the web a font that fails to load falls back to the system sans (never a browser serif).

@@ -5,6 +5,7 @@ import { Link } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FaceStack } from './DogFace';
 import { Icon } from './Icon';
+import { ENERGY_EMOJI, SIZE_EMOJI } from '@/lib/icons';
 import { areaWord, energyWord, fits, loneDog, sizesWord, whenLine, whyNot, type GroupCard as Group } from '@/lib/groups';
 import type { Dog } from '@/lib/social';
 import { C, F } from '@/lib/theme';
@@ -39,14 +40,14 @@ export function GroupCard({ group: g, dog }: { group: Group; dog: Dog | null }) 
           </View>
           {fit && dog ? (
             <View style={s.fit}>
-              <Icon name="check" size={14} color={C.accentDark} width={3} />
+              <Icon name="check" size={13} color="#FFFFFF" width={3} />
               <Text style={s.fitText}>Fits {dog.name}</Text>
             </View>
           ) : null}
         </View>
         <View style={s.chips}>
-          <View style={[s.chip, fit && s.chipOnGreen]}><Text style={s.chipText}>{sizesWord(g.sizes)}</Text></View>
-          <View style={[s.chip, fit && s.chipOnGreen]}><Text style={s.chipText}>{energyWord(g.energy)}</Text></View>
+          <View style={[s.chip, fit && s.chipOnGreen]}><Text style={s.chipText}>{SIZE_EMOJI} {sizesWord(g.sizes)}</Text></View>
+          <View style={[s.chip, fit && s.chipOnGreen]}><Text style={s.chipText}>{ENERGY_EMOJI[g.energy]} {energyWord(g.energy)}</Text></View>
         </View>
         <View style={s.bottom}>
           {g.faces && g.faces.length ? <FaceStack dogs={g.faces} size={30} max={4} /> : null}
@@ -62,22 +63,22 @@ export function GroupCard({ group: g, dog }: { group: Group; dog: Dog | null }) 
 
 const s = StyleSheet.create({
   card: { padding: 14, borderRadius: 18, borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, gap: 8 },
-  fitCard: { backgroundColor: C.accentSoft, borderColor: C.yesBorder },
+  fitCard: { borderColor: C.lineStrong },
   top: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
   name: { fontFamily: F.heavy, fontSize: 17, color: C.text },
   muted: { fontFamily: F.regular, fontSize: 14, color: C.muted },
   small: { fontFamily: F.regular, fontSize: 13, color: C.muted },
-  fit: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 4, paddingLeft: 7, paddingRight: 10, borderRadius: 12,
-         backgroundColor: C.bg },
-  fitText: { fontFamily: F.heavy, fontSize: 12, color: C.accentDark },
+  fit: { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: 3, paddingLeft: 6, paddingRight: 9, borderRadius: 11,
+         backgroundColor: C.go },
+  fitText: { fontFamily: F.heavy, fontSize: 12, color: '#FFFFFF' },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 6 },
   chip: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 10, backgroundColor: C.surface },
-  chipOnGreen: { backgroundColor: C.bg },
+  chipOnGreen: {},
   chipText: { fontFamily: F.bold, fontSize: 13, color: C.text },
   bottom: { flexDirection: 'row', alignItems: 'center', gap: 12 },
   count: { flex: 1, fontFamily: F.bold, fontSize: 14, color: C.muted },
-  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 12, paddingHorizontal: 14, borderRadius: 16,
-         borderWidth: 1, borderColor: C.line, minHeight: 56 },
+  row: { flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 10, paddingHorizontal: 14, borderRadius: 16,
+         borderWidth: 1, borderColor: C.line, backgroundColor: C.bg, minHeight: 52 },
   rowName: { fontFamily: F.heavy, fontSize: 15, color: C.text },
   why: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 12, backgroundColor: C.surface },
   whyText: { fontFamily: F.bold, fontSize: 12, color: C.muted },

@@ -99,7 +99,7 @@ export default function Find() {
           </View>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filters}>
             {FILTERS.map((f) => (
-              <FilterChip key={f.field} label={f.label} on={!!on[f.field]}
+              <FilterChip key={f.field} label={f.label} emoji={f.emoji} on={!!on[f.field]}
                           onPress={() => setOn((o) => ({ ...o, [f.field]: !o[f.field] }))} />
             ))}
           </ScrollView>
@@ -133,15 +133,15 @@ export default function Find() {
 }
 
 const s = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: C.bg },
-  map: { width: '100%', backgroundColor: '#E6EFE2', position: 'relative', overflow: 'hidden' },
+  screen: { flex: 1, backgroundColor: C.page },
+  map: { width: '100%', backgroundColor: C.page, position: 'relative', overflow: 'hidden' },
   overlay: { position: 'absolute', left: 0, right: 0, top: 0, padding: 12, gap: 8, zIndex: 1000 },
   searchRow: { flexDirection: 'row', alignItems: 'center', gap: 8, maxWidth: 720, width: '100%', alignSelf: 'center' },
   logo: { width: 44, height: 44, borderRadius: 22, backgroundColor: C.accent, alignItems: 'center', justifyContent: 'center',
           shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
-  search: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, height: 44, paddingHorizontal: 14, borderRadius: 22,
+  search: { flex: 1, flexDirection: 'row', alignItems: 'center', gap: 8, height: 42, paddingHorizontal: 14, borderRadius: 21,
             backgroundColor: '#FFFFFF', shadowColor: '#000', shadowOpacity: 0.15, shadowRadius: 4, shadowOffset: { width: 0, height: 1 }, elevation: 2 },
-  searchInput: { flex: 1, fontFamily: F.regular, fontSize: 15, color: C.text, height: 44 },
+  searchInput: { flex: 1, fontFamily: F.regular, fontSize: 15, color: C.text, height: 42 },
   filters: { gap: 8 },
   list: { paddingHorizontal: 16, paddingBottom: 24, maxWidth: 720, width: '100%', alignSelf: 'center' },
   head: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', paddingVertical: 12 },

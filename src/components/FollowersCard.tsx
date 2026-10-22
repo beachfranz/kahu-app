@@ -124,6 +124,6 @@ const s = StyleSheet.create({
   legendDot: { width: 10, height: 10, borderRadius: 5 },
   small: { fontFamily: F.regular, fontSize: 12, color: C.muted },
   muted: { fontFamily: F.regular, fontSize: 14, color: C.muted, lineHeight: 20 },
-  more: { height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: C.accent, alignItems: 'center', justifyContent: 'center' },
-  moreText: { fontFamily: F.heavy, fontSize: 15, color: C.accent },
+  more: { height: 38, borderRadius: 19, borderWidth: 1, borderColor: C.lineStrong, backgroundColor: C.bg, alignItems: 'center', justifyContent: 'center' },
+  moreText: { fontFamily: F.heavy, fontSize: 14, color: C.text },
 });

@@ -72,15 +72,28 @@ export const HIGHLIGHT_CHIPS: { field: keyof import('./api').Highlights; icon: I
 ];
 
 // Filter chips on find (each sends {field: true}: parks where a source states it).
-export const FILTERS: { field: string; label: string }[] = [
-  { field: 'small_dog_area', label: 'Small-dog area' },
-  { field: 'drinking_water', label: 'Water' },
-  { field: 'shade', label: 'Shade' },
-  { field: 'fenced', label: 'Fenced' },
-  { field: 'lighting', label: 'Lit at night' },
+export const FILTERS: { field: string; label: string; emoji: string }[] = [
+  { field: 'small_dog_area', label: 'Small dogs', emoji: '🐩' },
+  { field: 'drinking_water', label: 'Water', emoji: '🚰' },
+  { field: 'shade', label: 'Shade', emoji: '🌳' },
+  { field: 'fenced', label: 'Fenced', emoji: '🔒' },
+  { field: 'lighting', label: 'Lit at night', emoji: '💡' },
 ];
 
 export const SURFACE_LABEL: Record<string, string> = {
   grass: 'Grass', artificial_turf: 'Turf', dirt: 'Dirt', decomposed_granite: 'Granite', wood_chips: 'Wood chips',
   sand: 'Sand', gravel: 'Gravel', concrete: 'Concrete', mixed: 'Mixed',
 };
+
+// Colour emoji (as Dog Beach Scout uses them): the picture in tiles, chips and buttons. They render as the
+// platform's set (Apple on iPhone, Fluent on Windows), so there's nothing to load.
+export const EMOJI: Partial<Record<IconName, string>> = {
+  offleash: '🐕', fence: '🔒', gate: '🚪', small: '🐩', big: '🐕‍🦺', water: '🚰', splash: '💦', shade: '🌳',
+  bench: '🪑', picnic: '🧺', parking: '🅿️', restroom: '🚻', bags: '🛍️', light: '💡', agility: '🏁', ground: '🌱',
+  clock: '🕒', people: '🐾', calendar: '📅', directions: '🧭', heart: '❤️', share: '📤',
+};
+export const TAG_EMOJI: Record<string, string> = {
+  wrestlers_welcome: '🤼', chase_games: '🏃', small_dogs_welcome: '🐩', puppy_friendly: '🐶', calm_play: '😌', slow_intros: '🤝',
+};
+export const ENERGY_EMOJI: Record<string, string> = { low: '😴', medium: '🙂', high: '⚡' };
+export const SIZE_EMOJI = '🐕';
