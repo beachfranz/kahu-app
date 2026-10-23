@@ -5,9 +5,11 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, MultiChips } from '@/components/Form';
 import { Icon } from '@/components/Icon';
-import { TimeRow } from '@/components/TimeRow';
+import { WeekGrid, type WeekBlock } from '@/components/WeekGrid';
+import { daysWord } from '@/lib/groups';
+import { dogsIn, EMPTY_HEAT, hhmmSlot, matchWeek, namesLine, slotHHMM, slotRange, SLOTS, type Heat } from '@/lib/schedule';
 import {
-  deleteAvailability, localTz, myPresence, saveAvailability, TAGS, WEEKDAYS, type MyPresence,
+  deleteAvailability, localTz, myPresence, saveAvailability, TAGS, type MyPresence,
 } from '@/lib/presence';
 import { myProfile, useSession, type Dog } from '@/lib/social';
 import { C, F } from '@/lib/theme';
@@ -27,6 +29,17 @@ export default function EditFreeTime() {
   const [d, setD] = useState<Draft | null>(null);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [heat, setHeat] = useState<Heat>(EMPTY_HEAT);
+
+  // Shading: dogs that suit the chosen dogs, free at the chosen parks.
+  const parksKey = d?.park_ids.join(',') ?? '', dogsKey = d?.dog_ids.join(',') ?? '';
+  useEffect(() => {
+    if (!parksKey || !dogsKey) return;
+    let alive = true;
+    matchWeek({ parkIds: parksKey.split(',').map(Number), dogIds: dogsKey.split(',') })
+      .then((h) => { if (alive) setHeat(h); }).catch(() => {});
+    return () => { alive = false; };
+  }, [parksKey, dogsKey]);
 
   useEffect(() => {
     if (!session) return;
@@ -53,6 +66,9 @@ export default function EditFreeTime() {
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((x) => (x ? { ...x, [k]: v } : x));
   const follows = mine?.follows ?? [];
+  const block: WeekBlock = { days: d.weekdays.map(Number), a: hhmmSlot(d.start_local), b: hhmmSlot(d.end_local) };
+  const setBlock = (v: WeekBlock) => setD((x) => (x ? { ...x, weekdays: v.days.map(String), start_local: slotHHMM(v.a), end_local: slotHHMM(v.b) } : x));
+  const free = block.days.length && parksKey ? dogsIn(heat, block.days, block.a, block.b) : [];
   const ok = d.dog_ids.length && d.park_ids.length && d.weekdays.length && d.end_local > d.start_local;
 
   const save = async () => {
@@ -90,9 +106,18 @@ export default function EditFreeTime() {
         ) : (
           <View style={s.note}><Text style={s.muted}>Follow a park first (on its page); free times are matched at parks you follow.</Text></View>
         )}
-        <MultiChips label="Days" options={WEEKDAYS} value={d.weekdays} onChange={(v) => set('weekdays', v)} />
-        <TimeRow label="From" value={d.start_local} onChange={(v) => set('start_local', v)} />
-        <TimeRow label="Until" value={d.end_local} onChange={(v) => set('end_local', v)} min={d.start_local} />
+        <View style={{ gap: 8 }}>
+          <Text style={s.label} accessibilityRole="header">When</Text>
+          <WeekGrid value={block} onChange={setBlock} heat={heat} maxLen={SLOTS} mine="Free" theirs="Dogs that suit yours, free" />
+          <View style={s.summary} accessibilityLiveRegion="polite">
+            <Text style={s.sumLine}>{block.days.length ? `${daysWord(block.days)}, ${slotRange(block.a, block.b)}` : 'Drag or tap the week'}</Text>
+            {block.days.length && parksKey ? (
+              <Text style={[s.sumMatch, !free.length && { color: C.muted }]}>
+                {free.length ? `${namesLine(free)} ${free.length === 1 ? 'is' : 'are'} free then too` : 'No dogs that suit yours are free then yet'}
+              </Text>
+            ) : null}
+          </View>
+        </View>
         <MultiChips label="Play we’re up for (optional)" options={TAGS} value={d.tags} onChange={(v) => set('tags', v)} />
         <Button label={busy ? 'Saving…' : 'Save'} onPress={save} disabled={!ok || busy} />
         {d.id ? <Button label="Delete this free time" kind="danger" onPress={remove} disabled={busy} /> : null}
@@ -110,7 +135,10 @@ const s = StyleSheet.create({
   round: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: F.heavy, fontSize: 22, color: C.text },
   body: { padding: 20, gap: 18, maxWidth: 640, width: '100%', alignSelf: 'center', paddingBottom: 48 },
-  label: { fontFamily: F.heavy, fontSize: 14, color: C.text },
+  label: { fontFamily: F.heavy, fontSize: 13, color: C.text },
+  summary: { backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, gap: 2 },
+  sumLine: { fontFamily: F.heavy, fontSize: 15, color: C.text },
+  sumMatch: { fontFamily: F.bold, fontSize: 13, color: C.go },
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21 },
   note: { padding: 14, borderRadius: 16, backgroundColor: C.ask },
   error: { fontFamily: F.semibold, fontSize: 14, color: '#A33A2B' },

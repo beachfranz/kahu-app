@@ -5,17 +5,17 @@ import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Field, Button, MultiChips, Segmented, Toggle } from '@/components/Form';
 import { Icon } from '@/components/Icon';
-import { TimeRow } from '@/components/TimeRow';
+import { WeekGrid, type WeekBlock } from '@/components/WeekGrid';
 import { confirmAction } from '@/lib/confirm';
 import { park as fetchPark } from '@/lib/api';
 import {
-  closeGroup, energyFitWord, groupDetail, saveGroup, sizesWord, suggestName, timeRange, type Energy, type GroupDraft, type Size,
+  closeGroup, daysWord, energyFitWord, groupDetail, saveGroup, sizesWord, suggestName, type Energy, type GroupDraft, type Size,
 } from '@/lib/groups';
-import { followPark, myPresence, TAGS, WEEKDAYS } from '@/lib/presence';
+import { followPark, myPresence, TAGS } from '@/lib/presence';
+import { dogsIn, EMPTY_HEAT, hhmmSlot, matchWeek, namesLine, slotHHMM, slotRange, type Heat } from '@/lib/schedule';
 import { ENERGY, myProfile, SIZES, useSession, type Dog } from '@/lib/social';
 import { C, F } from '@/lib/theme';
 
-const LENGTHS = [['30', '30 min'], ['60', '1 hour'], ['90', '1½ hours'], ['120', '2 hours']] as const;
 const AREAS = [['whole', 'Whole park'], ['small', 'Small dog area'], ['large', 'Big dog area']] as const;
 
 type Draft = Omit<GroupDraft, 'weekdays' | 'minutes'> & { weekdays: string[]; minutes: string; named: boolean };
@@ -38,6 +38,16 @@ export default function EditGroup() {
   const [more, setMore] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const [heat, setHeat] = useState<Heat>(EMPTY_HEAT);
+
+  // Shading: dogs that fit the group as drafted (its sizes and energy), free at this park.
+  const parkId = d?.park_id, sizesKey = d?.sizes.join(',') ?? '', energy = d?.energy;
+  useEffect(() => {
+    if (!parkId || !sizesKey || !energy) return;
+    let alive = true;
+    matchWeek({ parkIds: [parkId], sizes: sizesKey.split(','), energy }).then((h) => { if (alive) setHeat(h); }).catch(() => {});
+    return () => { alive = false; };
+  }, [parkId, sizesKey, energy]);
 
   useEffect(() => {
     if (!session) return;
@@ -95,6 +105,14 @@ export default function EditGroup() {
     return n;
   });
   const runner = dogs.find((x) => x.id === d.runner_dog_id);
+  const block: WeekBlock = { days: d.weekdays.map(Number), a: hhmmSlot(d.start_local), b: hhmmSlot(d.start_local) + Number(d.minutes) / 30 };
+  const setBlock = (v: WeekBlock) => setD((x) => {
+    if (!x) return x;
+    const n = { ...x, weekdays: v.days.map(String), start_local: slotHHMM(v.a), minutes: String((v.b - v.a) * 30) };
+    if (!n.named && n.weekdays.length && n.sizes.length) n.name = suggestName(Number(n.weekdays[0]), n.sizes, n.energy);
+    return n;
+  });
+  const free = block.days.length ? dogsIn(heat, block.days, block.a, block.b) : [];
   const ok = d.name.trim().length >= 3 && d.weekdays.length && d.sizes.length && d.energy && d.runner_dog_id;
 
   const save = async () => {
@@ -129,11 +147,6 @@ export default function EditGroup() {
       </View>
       <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
         <Field label="Name" value={d.name} maxLength={40} onChangeText={(v) => setD({ ...d, name: v, named: true })} />
-        <MultiChips label="Days" options={WEEKDAYS} value={d.weekdays} onChange={(v) => set('weekdays', v)} />
-        <TimeRow label="Starts" value={d.start_local} onChange={(v) => set('start_local', v)} />
-        <Segmented label="How long" options={LENGTHS} value={d.minutes as (typeof LENGTHS)[number][0]}
-                   onChange={(v) => v && set('minutes', v)} />
-        <Text style={s.hint}>{timeRange(d.start_local, Number(d.minutes))}</Text>
         {dogs.length > 1 ? (
           <Segmented label="Run by" options={dogs.map((x) => [x.id, x.name] as const)} value={d.runner_dog_id}
                      onChange={(v) => v && set('runner_dog_id', v)} />
@@ -146,6 +159,22 @@ export default function EditGroup() {
             {runner && runner.size_band && !d.sizes.includes(runner.size_band) ? ` ${runner.name} is ${runner.size_band}, so include that size too.` : ''}
           </Text>
         ) : null}
+
+        <View style={{ gap: 8 }}>
+          <View style={s.whenHead}>
+            <Text style={s.label} accessibilityRole="header">When it meets</Text>
+            <Text style={s.tiny}>Drag or tap the week</Text>
+          </View>
+          <WeekGrid value={block} onChange={setBlock} heat={heat} mine="Your group" theirs="Dogs that fit, usually free" />
+          <View style={s.summary} accessibilityLiveRegion="polite">
+            <Text style={s.sumLine}>{block.days.length ? `${daysWord(block.days)}, ${slotRange(block.a, block.b)}` : 'Pick a day and time on the grid'}</Text>
+            {block.days.length ? (
+              <Text style={[s.sumMatch, !free.length && { color: C.muted }]}>
+                {free.length ? `${namesLine(free)} ${free.length === 1 ? 'is' : 'are'} usually free then` : 'No dogs that fit are free then yet'}
+              </Text>
+            ) : null}
+          </View>
+        </View>
 
         <Pressable onPress={() => setMore(!more)} style={s.fold} accessibilityRole="button" accessibilityState={{ expanded: more }}>
           <Text style={s.foldText}>More about the play (optional)</Text>
@@ -180,6 +209,12 @@ const s = StyleSheet.create({
   body: { padding: 20, gap: 18, maxWidth: 640, width: '100%', alignSelf: 'center', paddingBottom: 48 },
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21 },
   hint: { fontFamily: F.regular, fontSize: 14, color: C.muted, lineHeight: 20, marginTop: -10 },
+  label: { fontFamily: F.heavy, fontSize: 13, color: C.text },
+  tiny: { fontFamily: F.regular, fontSize: 12, color: C.muted },
+  whenHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
+  summary: { backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, gap: 2 },
+  sumLine: { fontFamily: F.heavy, fontSize: 15, color: C.text },
+  sumMatch: { fontFamily: F.bold, fontSize: 13, color: C.go },
   small: { fontFamily: F.regular, fontSize: 13, color: C.muted, textAlign: 'center' },
   fold: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', minHeight: 44 },
   foldText: { fontFamily: F.heavy, fontSize: 15, color: C.text },

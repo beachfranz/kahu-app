@@ -165,7 +165,7 @@ export function PresenceCard({ parkId, parkName, onPresence }:
         </View>
       )}
       {msg ? <Text style={s.error}>{msg}</Text> : null}
-      <PlanSheet visible={plan} parkName={parkName} dogsLabel={dogsLabel} onClose={() => setPlan(false)}
+      <PlanSheet visible={plan} parkId={parkId} parkName={parkName} dogIds={who} dogsLabel={dogsLabel} onClose={() => setPlan(false)}
                  onSave={async (a, b) => { setPp(await planVisit(parkId, who, a, b)); setPlan(false); }} />
     </View>
   );
