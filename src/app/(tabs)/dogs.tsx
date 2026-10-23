@@ -216,8 +216,8 @@ function Together({ dogs }: { dogs: Dog[] }) {
 
       <Text style={s.h2} accessibilityRole="header">Free times</Text>
       {free.length ? free.map((a) => (
-        <Pressable key={a.id} style={s.row} accessibilityRole="button" accessibilityLabel={`Edit free time ${days(a.weekdays)}`}
-                   onPress={() => router.push({ pathname: '/free-time/edit', params: { id: a.id } })}>
+        <Pressable key={a.id} style={s.row} accessibilityRole="button" accessibilityLabel={`Free time ${days(a.weekdays)}. Edit your week`}
+                   onPress={() => router.push('/free-time/edit')}>
           <View style={{ flex: 1, gap: 2 }}>
             <Text style={s.rowTitle}>{days(a.weekdays)} · {hhmm(a.start_local)}–{hhmm(a.end_local)}</Text>
             <Text style={s.small} numberOfLines={2}>
@@ -231,7 +231,7 @@ function Together({ dogs }: { dogs: Dog[] }) {
           <Text style={s.muted}>Add when you can usually go. You’ll see other dogs who are free at the same parks and times, even before anyone checks in.</Text>
         </View>
       )}
-      <Button label="+ Add a free time" kind="secondary" onPress={() => router.push('/free-time/edit')} />
+      <Button label={free.length ? 'Edit your week' : 'Add your free times'} emoji="📅" kind="secondary" onPress={() => router.push('/free-time/edit')} />
 
       {free.length ? (
         <>

@@ -54,3 +54,49 @@ export function namesLine(dogs: { name: string }[]): string {
   if (n.length <= 2) return n.join(' and ');
   return `${n.slice(0, 2).join(', ')} and ${n.length - 2} more`;
 }
+
+// ---- free times as a painted week (keys "weekday-slot", see WeekPaint)
+export type FreeBlock = { days: number[]; a: number; b: number };
+const MON_FIRST = (d: number) => (d + 6) % 7;
+
+// Runs of painted slots per day; days sharing the exact same run become one block ("Sat and Sun, 8 to 10 am").
+export function blocksOf(slots: ReadonlySet<string>): FreeBlock[] {
+  const out: FreeBlock[] = [];
+  for (let d = 0; d < 7; d++) {
+    let a: number | null = null;
+    for (let s = 0; s <= SLOTS; s++) {
+      const on = s < SLOTS && slots.has(`${d}-${s}`);
+      if (on && a === null) a = s;
+      if (!on && a !== null) {
+        const same = out.find((x) => x.a === a && x.b === s);
+        if (same) same.days.push(d); else out.push({ days: [d], a, b: s });
+        a = null;
+      }
+    }
+  }
+  const first = (x: FreeBlock) => Math.min(...x.days.map(MON_FIRST));
+  return out.sort((x, y) => first(x) - first(y) || x.a - y.a)
+    .map((x) => ({ ...x, days: [...x.days].sort((p, q) => MON_FIRST(p) - MON_FIRST(q)) }));
+}
+export function slotsOf(rows: { weekdays: number[]; start_local: string; end_local: string }[]): Set<string> {
+  const out = new Set<string>();
+  for (const r of rows) for (const d of r.weekdays) for (let s = hhmmSlot(r.start_local); s < hhmmSlot(r.end_local); s++) out.add(`${d}-${s}`);
+  return out;
+}
+// Move one block's times on its days (steppers).
+export function retime(slots: ReadonlySet<string>, blk: FreeBlock, a: number, b: number): Set<string> {
+  const out = new Set(slots);
+  for (const d of blk.days) {
+    for (let s = blk.a; s < blk.b; s++) out.delete(`${d}-${s}`);
+    for (let s = a; s < b; s++) out.add(`${d}-${s}`);
+  }
+  return out;
+}
+
+export async function saveFreeWeek(p: { dog_ids: string[]; park_ids: number[]; tags: string[]; tz: string; blocks: FreeBlock[] }) {
+  const { error } = await supabase.rpc('save_free_week', { p: {
+    dog_ids: p.dog_ids, park_ids: p.park_ids, tags: p.tags, tz: p.tz,
+    blocks: p.blocks.map((x) => ({ weekdays: x.days, start_local: slotHHMM(x.a), end_local: slotHHMM(x.b) })),
+  } });
+  if (error) throw new Error(error.message);
+}

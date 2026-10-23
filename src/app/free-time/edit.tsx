@@ -1,32 +1,35 @@
-import { router, useLocalSearchParams } from 'expo-router';
+import { router } from 'expo-router';
 import Head from 'expo-router/head';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, MultiChips } from '@/components/Form';
 import { Icon } from '@/components/Icon';
-import { WeekGrid, type WeekBlock } from '@/components/WeekGrid';
+import { Stepper, WeekPaint } from '@/components/WeekGrid';
 import { daysWord } from '@/lib/groups';
-import { dogsIn, EMPTY_HEAT, hhmmSlot, matchWeek, namesLine, slotHHMM, slotRange, SLOTS, type Heat } from '@/lib/schedule';
+import { localTz, myPresence, TAGS, type MyPresence } from '@/lib/presence';
 import {
-  deleteAvailability, localTz, myPresence, saveAvailability, TAGS, type MyPresence,
-} from '@/lib/presence';
+  blocksOf, dogsIn, EMPTY_HEAT, matchWeek, namesLine, retime, saveFreeWeek, slotClock, slotRange, slotsOf, SLOTS, type FreeBlock, type Heat,
+} from '@/lib/schedule';
 import { myProfile, useSession, type Dog } from '@/lib/social';
 import { C, F } from '@/lib/theme';
 
-type Draft = { id?: string; dog_ids: string[]; park_ids: string[]; weekdays: string[]; start_local: string; end_local: string; tags: string[] };
+type Draft = { dog_ids: string[]; park_ids: string[]; tags: string[]; slots: Set<string> };
 
 function leave() {
   if (router.canGoBack()) router.back();
   else router.replace('/dogs');
 }
+const union = <T,>(xs: T[][]) => [...new Set(xs.flat())];
 
-export default function EditFreeTime() {
-  const { id } = useLocalSearchParams<{ id?: string }>();
+// Free times as one week (Franz 2026-10-23): paint when you can usually go; the blocks share who's going, the
+// parks and the kind of play. Kahu shows which dogs that suit yours are free at the same times.
+export default function FreeWeek() {
   const { session, ready } = useSession();
   const [dogs, setDogs] = useState<Dog[] | null>(null);
   const [mine, setMine] = useState<MyPresence | undefined>(undefined);
   const [d, setD] = useState<Draft | null>(null);
+  const [mixed, setMixed] = useState(false);
   const [busy, setBusy] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
   const [heat, setHeat] = useState<Heat>(EMPTY_HEAT);
@@ -45,17 +48,19 @@ export default function EditFreeTime() {
     if (!session) return;
     Promise.all([myProfile(), myPresence()]).then(([p, m]) => {
       const ds = p?.dogs ?? [];
+      const rows = (m?.availability ?? []).filter((a) => a.active);
+      const key = (a: { dog_ids: string[]; park_ids: number[]; tags: string[] }) =>
+        JSON.stringify([[...a.dog_ids].sort(), [...a.park_ids].sort(), [...a.tags].sort()]);
       setDogs(ds); setMine(m);
-      const a = m?.availability.find((x) => x.id === id);
-      setD(a ? {
-        id: a.id, dog_ids: a.dog_ids, park_ids: a.park_ids.map(String), weekdays: a.weekdays.map(String),
-        start_local: a.start_local.slice(0, 5), end_local: a.end_local.slice(0, 5), tags: a.tags,
+      setMixed(new Set(rows.map(key)).size > 1);
+      setD(rows.length ? {
+        dog_ids: union(rows.map((a) => a.dog_ids)), park_ids: union(rows.map((a) => a.park_ids.map(String))),
+        tags: union(rows.map((a) => a.tags)), slots: slotsOf(rows),
       } : {
-        dog_ids: ds.map((x) => x.id), park_ids: m?.follows.length === 1 ? [String(m.follows[0].park_id)] : [],
-        weekdays: [], start_local: '08:00', end_local: '09:30', tags: [],
+        dog_ids: ds.map((x) => x.id), park_ids: (m?.follows ?? []).slice(0, 10).map((f) => String(f.park_id)), tags: [], slots: new Set(),
       });
     }).catch((e: Error) => setMsg(e.message));
-  }, [id, session]);
+  }, [session]);
 
   if (ready && !session) {
     return <SafeAreaView style={s.center}><Text style={s.muted}>Sign in on the My dogs tab first.</Text></SafeAreaView>;
@@ -66,37 +71,37 @@ export default function EditFreeTime() {
 
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((x) => (x ? { ...x, [k]: v } : x));
   const follows = mine?.follows ?? [];
-  const block: WeekBlock = { days: d.weekdays.map(Number), a: hhmmSlot(d.start_local), b: hhmmSlot(d.end_local) };
-  const setBlock = (v: WeekBlock) => setD((x) => (x ? { ...x, weekdays: v.days.map(String), start_local: slotHHMM(v.a), end_local: slotHHMM(v.b) } : x));
-  const free = block.days.length && parksKey ? dogsIn(heat, block.days, block.a, block.b) : [];
-  const ok = d.dog_ids.length && d.park_ids.length && d.weekdays.length && d.end_local > d.start_local;
+  const blocks = blocksOf(d.slots);
+  const tooMany = blocks.length > 10;
+  const ok = !tooMany && (blocks.length === 0 || (d.dog_ids.length > 0 && d.park_ids.length > 0));
+  const nudge = (b: FreeBlock, which: 'a' | 'b', by: number) => {
+    let { a, b: e } = b;
+    if (which === 'a') a = Math.max(0, Math.min(e - 1, a + by)); else e = Math.min(SLOTS, Math.max(a + 1, e + by));
+    set('slots', retime(d.slots, b, a, e));
+  };
 
   const save = async () => {
     setBusy(true); setMsg(null);
     try {
-      await saveAvailability({ ...d, park_ids: d.park_ids.map(Number), weekdays: d.weekdays.map(Number), tz: localTz() } as never);
+      await saveFreeWeek({ dog_ids: d.dog_ids, park_ids: d.park_ids.map(Number), tags: d.tags, tz: localTz(), blocks });
       leave();
     } catch (e) { setMsg((e as Error).message); }
     finally { setBusy(false); }
   };
-  const remove = async () => {
-    if (!d.id) return;
-    setBusy(true);
-    try { await deleteAvailability(d.id); leave(); }
-    catch (e) { setMsg((e as Error).message); setBusy(false); }
-  };
 
   return (
     <SafeAreaView style={s.screen} edges={['top']}>
-      <Head><title>{d.id ? 'Edit free time' : 'Add a free time'} · Kahu</title></Head>
+      <Head><title>Free times · Kahu</title></Head>
       <View style={s.top}>
         <Pressable onPress={leave} style={s.round} accessibilityRole="button" accessibilityLabel="Back">
           <Icon name="back" size={22} color={C.text} width={2.2} />
         </Pressable>
-        <Text style={s.title} accessibilityRole="header">{d.id ? 'Edit free time' : 'Add a free time'}</Text>
+        <View style={{ flex: 1 }}>
+          <Text style={s.title} accessibilityRole="header">Free times</Text>
+          <Text style={s.sub}>When you can usually go</Text>
+        </View>
       </View>
       <ScrollView contentContainerStyle={s.body}>
-        <Text style={s.muted}>When you can usually go. Kahu matches it with other dogs’ free times at the same parks; nobody sees it unless they follow that park too.</Text>
         {dogs.length > 1 ? (
           <MultiChips label="Who" options={dogs.map((x) => [x.id, x.name] as const)} value={d.dog_ids} onChange={(v) => set('dog_ids', v)} />
         ) : null}
@@ -106,21 +111,46 @@ export default function EditFreeTime() {
         ) : (
           <View style={s.note}><Text style={s.muted}>Follow a park first (on its page); free times are matched at parks you follow.</Text></View>
         )}
+        {mixed ? <Text style={s.hint}>Your free times now share one set of dogs, parks and play.</Text> : null}
+
         <View style={{ gap: 8 }}>
-          <Text style={s.label} accessibilityRole="header">When</Text>
-          <WeekGrid value={block} onChange={setBlock} heat={heat} maxLen={SLOTS} mine="Free" theirs="Dogs that suit yours, free" />
-          <View style={s.summary} accessibilityLiveRegion="polite">
-            <Text style={s.sumLine}>{block.days.length ? `${daysWord(block.days)}, ${slotRange(block.a, block.b)}` : 'Drag or tap the week'}</Text>
-            {block.days.length && parksKey ? (
-              <Text style={[s.sumMatch, !free.length && { color: C.muted }]}>
-                {free.length ? `${namesLine(free)} ${free.length === 1 ? 'is' : 'are'} free then too` : 'No dogs that suit yours are free then yet'}
-              </Text>
-            ) : null}
+          <View style={s.whenHead}>
+            <Text style={s.label} accessibilityRole="header">Your week</Text>
+            <Text style={s.tiny}>Drag to paint, tap to add or remove an hour</Text>
           </View>
+          <WeekPaint value={d.slots} onChange={(v) => set('slots', v)} heat={heat} />
         </View>
+
+        <View style={{ gap: 8 }} accessibilityLiveRegion="polite">
+          {blocks.length === 0 ? <Text style={s.muted}>Nothing painted yet. Your free times stay private to followers of the same parks.</Text> : null}
+          {blocks.map((b) => {
+            const free = d.park_ids.length ? dogsIn(heat, b.days, b.a, b.b) : [];
+            return (
+              <View key={`${b.days.join()}-${b.a}`} style={s.block}>
+                <View style={s.blockTop}>
+                  <View style={{ flex: 1, gap: 2 }}>
+                    <Text style={s.blockWhen}>{daysWord(b.days)}, {slotRange(b.a, b.b)}</Text>
+                    <Text style={[s.blockMatch, !free.length && { color: C.muted }]}>
+                      {free.length ? `${namesLine(free)} ${free.length === 1 ? 'is' : 'are'} free then too` : 'No dogs that suit yours are free then yet'}
+                    </Text>
+                  </View>
+                  <Pressable onPress={() => set('slots', retime(d.slots, b, 0, 0))} style={s.remove} hitSlop={6}
+                             accessibilityRole="button" accessibilityLabel={`Remove ${daysWord(b.days)}, ${slotRange(b.a, b.b)}`}>
+                    <Icon name="close" size={16} color={C.muted} width={2.2} />
+                  </Pressable>
+                </View>
+                <View style={s.steps}>
+                  <Stepper label="From" value={slotClock(b.a)} onDown={() => nudge(b, 'a', -1)} onUp={() => nudge(b, 'a', 1)} />
+                  <Stepper label="Until" value={slotClock(b.b)} onDown={() => nudge(b, 'b', -1)} onUp={() => nudge(b, 'b', 1)} />
+                </View>
+              </View>
+            );
+          })}
+          {tooMany ? <Text style={s.error}>At most 10 different times a week; join some up.</Text> : null}
+        </View>
+
         <MultiChips label="Play we’re up for (optional)" options={TAGS} value={d.tags} onChange={(v) => set('tags', v)} />
         <Button label={busy ? 'Saving…' : 'Save'} onPress={save} disabled={!ok || busy} />
-        {d.id ? <Button label="Delete this free time" kind="danger" onPress={remove} disabled={busy} /> : null}
         {msg ? <Text style={s.error}>{msg}</Text> : null}
       </ScrollView>
     </SafeAreaView>
@@ -134,11 +164,18 @@ const s = StyleSheet.create({
          maxWidth: 640, width: '100%', alignSelf: 'center' },
   round: { width: 40, height: 40, borderRadius: 20, backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, alignItems: 'center', justifyContent: 'center' },
   title: { fontFamily: F.heavy, fontSize: 22, color: C.text },
+  sub: { fontFamily: F.regular, fontSize: 14, color: C.muted },
   body: { padding: 20, gap: 18, maxWidth: 640, width: '100%', alignSelf: 'center', paddingBottom: 48 },
   label: { fontFamily: F.heavy, fontSize: 13, color: C.text },
-  summary: { backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, borderRadius: 14, paddingVertical: 10, paddingHorizontal: 12, gap: 2 },
-  sumLine: { fontFamily: F.heavy, fontSize: 15, color: C.text },
-  sumMatch: { fontFamily: F.bold, fontSize: 13, color: C.go },
+  tiny: { fontFamily: F.regular, fontSize: 12, color: C.muted },
+  whenHead: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline', gap: 8, flexWrap: 'wrap' },
+  hint: { fontFamily: F.regular, fontSize: 13, color: C.muted, marginTop: -8 },
+  block: { backgroundColor: C.bg, borderWidth: 1, borderColor: C.line, borderRadius: 14, padding: 12, gap: 8 },
+  blockTop: { flexDirection: 'row', alignItems: 'flex-start', gap: 10 },
+  blockWhen: { fontFamily: F.heavy, fontSize: 15, color: C.text },
+  blockMatch: { fontFamily: F.bold, fontSize: 13, color: C.go },
+  remove: { width: 28, height: 28, borderRadius: 14, backgroundColor: C.surface, alignItems: 'center', justifyContent: 'center' },
+  steps: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 8 },
   muted: { fontFamily: F.regular, fontSize: 15, color: C.muted, lineHeight: 21 },
   note: { padding: 14, borderRadius: 16, backgroundColor: C.ask },
   error: { fontFamily: F.semibold, fontSize: 14, color: '#A33A2B' },
